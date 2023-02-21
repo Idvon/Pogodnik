@@ -13,6 +13,6 @@ lon = city_data["lon"]
 call = requests.get("https://api.openweathermap.org/data/2.5/weather?"
                     "lat="+str(lat)+"&lon="+str(lon)+"&"
                     "appid=2427c9b0a80567c0e8c21bdc1bd0b125&"
-                    "units=metric&"
-                    "lang=ru")
-print(call.json())
+                    "units=metric&")
+data = call.json()
+print("Temperature: "+str(data["main"]["temp"])+" C"+"\N{DEGREE SIGN}")
