@@ -18,7 +18,9 @@ else:
                         "appid=2427c9b0a80567c0e8c21bdc1bd0b125&"
                         "units=metric&")
     data = call.json()
-    print(f"Weather in {city['city_name']}, Country: {city_data['country']}\n"
+    print(f"Weather in {city['city_name']}\n"
+          f"Country: {city_data['country']}\n"
+          f"State: {city_data['state']}\n"
           f"Temperature: {data['main']['temp']} C\N{degree sign}\n"
           f"Humidity: {data['main']['humidity']} %\n"
           f"Wind speed: {data['wind']['speed']} m/s\n"
