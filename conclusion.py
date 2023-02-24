@@ -1,4 +1,4 @@
-def printing(data: dict[str, int]) -> str:
+def printing(data: dict) -> str:
     text = f"Weather in {data['city']}\n"\
            f"Country: {data['country']}\n"\
            f"State: {data['state']}\n"\
