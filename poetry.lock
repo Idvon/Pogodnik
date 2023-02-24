@@ -1,0 +1,15 @@
+[[package]]
+name = "toml"
+version = "0.10.2"
+description = "Python Library for Tom's Obvious, Minimal Language"
+category = "main"
+optional = false
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+
+[metadata]
+lock-version = "1.1"
+python-versions = "^3.9"
+content-hash = "3dc7af43729f7ff1e7cf84103a3e2c1945f233884eaa149c7e8d92cccb593984"
+
+[metadata.files]
+toml = []
