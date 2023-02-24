@@ -17,5 +17,6 @@ def weather_data(city):
          'temp': data['current_weather']['temperature'],
          'humidity': int(statistics.mean(data['hourly']['relativehumidity_2m'])),
          'windspd': data['current_weather']['windspeed'],
-         'winddeg': data['current_weather']['winddirection']}
+         'winddeg': int(data['current_weather']['winddirection']),
+         'provider': 'Open-Meteo'}
     return d

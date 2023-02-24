@@ -15,5 +15,6 @@ def weather_data(city):
          'temp': data['main']['temp'],
          'humidity': data['main']['humidity'],
          'windspd': data['wind']['speed'],
-         'winddeg': data['wind']['deg']}
+         'winddeg': data['wind']['deg'],
+         'provider': 'Open Weather'}
     return d
