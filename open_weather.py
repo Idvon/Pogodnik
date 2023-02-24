@@ -1,7 +1,8 @@
 import requests
+from typing import Union
 
 
-def weather_data(city):
+def weather_data(city: dict[str, int]) -> dict[str, int]:
     lat = city['lat']
     lon = city['lon']
     call = requests.get("https://api.openweathermap.org/data/2.5/weather?"

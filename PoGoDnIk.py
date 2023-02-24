@@ -11,13 +11,11 @@ def main():
     city = geocoding.geo(config_data)
     if city == 0:
         return "This city is not found. Please, check city name"
-    else:
-        if config_data['provider_name'] == "openweather":
-            return conclusion.printing(open_weather.weather_data(city))
-        elif config_data['provider_name'] == "openmeteo":
-            return conclusion.printing(open_meteo.weather_data(city))
-        else:
-            return "Please, check provider name"
+    elif config_data['provider_name'] == "openweather":
+        return conclusion.printing(open_weather.weather_data(city))
+    elif config_data['provider_name'] == "openmeteo":
+        return conclusion.printing(open_meteo.weather_data(city))
+    return "Please, check provider name"
 
 
 if __name__ == "__main__":
