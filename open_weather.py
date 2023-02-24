@@ -1,5 +1,4 @@
 import requests
-from typing import Union
 
 
 def weather_data(city: dict[str, int]) -> dict[str, int]:
