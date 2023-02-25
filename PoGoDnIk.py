@@ -9,15 +9,16 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser(description="Weather by config file")
-    parser.add_argument("Filename", type=str)
-    file_name = parser.parse_args()
-    if file_name.Filename.count("json") == 1:
-        with open("config.json") as f:
+    parser.add_argument("filename", type=str)
+    args = parser.parse_args()
+    with open(args.filename) as f:
+        if args.filename.endswith("json"):
             config_data = json.load(f)
-    elif file_name.Filename.count("toml") == 1:
-        with open("config.toml") as f:
+        elif args.filename.endswith("toml"):
             config_data = toml.load(f)
-    city = geocoding.geo(config_data)
+    geo_data = {'city_name': config_data['city_name'],
+                'api_key': config_data['geo_provider']['api_key']}
+    city = geocoding.geo(geo_data)
     if city is None:
         return "This city is not found. Please, check city name"
     elif config_data['weather_provider']['name'] == "openweather":
