@@ -1,10 +1,10 @@
 import json
 import toml
-import open_weather
-import conclusion
-import open_meteo
-import geocoding
 import argparse
+from src import open_weather
+from src import open_meteo
+from src.conclusion import printing
+from src.geocoding import geo
 
 
 def main():
@@ -18,14 +18,14 @@ def main():
             config_data = toml.load(f)
     geo_data = {'city_name': config_data['city_name'],
                 'api_key': config_data['geo_provider']['api_key']}
-    city = geocoding.geo(geo_data)
+    city = geo(geo_data)
     if city is None:
         return "This city is not found. Please, check city name"
     elif config_data['weather_provider']['name'] == "openweather":
         appid = config_data['weather_provider']['api_key']
-        return conclusion.printing(open_weather.weather_data(city, appid))
+        return printing(open_weather.weather_data(city, appid))
     elif config_data['weather_provider']['name'] == "openmeteo":
-        return conclusion.printing(open_meteo.weather_data(city))
+        return printing(open_meteo.weather_data(city))
     return "Please, check provider name"
 
 
