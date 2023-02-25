@@ -2,10 +2,8 @@ import requests
 
 
 def weather_data(city: dict) -> dict:
-    lat = city['lat']
-    lon = city['lon']
     call = requests.get("https://api.open-meteo.com/v1/forecast?"
-                        f"latitude={lat}&longitude={lon}&"
+                        f"latitude={city['lat']}&longitude={city['lon']}&"
                         "current_weather=true&"
                         "windspeed_unit=ms&"
                         "hourly=relativehumidity_2m")

@@ -1,4 +1,7 @@
 city_name = "Saint Petersburg"
-[provider]
+[weather_provider]
+name = "openweather"
+api_key = "2427c9b0a80567c0e8c21bdc1bd0b125"
+[geo_provider]
 name = "openweather"
 api_key = "2427c9b0a80567c0e8c21bdc1bd0b125"
