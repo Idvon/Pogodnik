@@ -1,0 +1,11 @@
+{
+"city_name": "Saint Petersburg",
+"weather_provider": {
+  "name": "openweather",
+  "api_key": "your api key"
+},
+"geo_provider": {
+  "name": "openweather",
+  "api_key": "your api key"
+}
+}
