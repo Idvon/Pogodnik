@@ -7,14 +7,12 @@ def printing(data, out_name: [dict, str]) -> str:
     if data is None:
         return "Please, check api key"
     else:
-        if os.path.exists(out_name) is True:
-            f = open(out_name, "a", newline='')
-        else:
-            f = open(out_name, "w", newline='')
-        writer = csv.writer(f)
-        writer.writerow([key for key in data])
-        writer.writerow([data[key] for key in data])
-        f.close()
+        text = None if os.path.exists(out_name) else data.keys()
+        with open(out_name, "a", newline='') as f:
+            writer = csv.writer(f)
+            if text is not None:
+                writer.writerow(text)
+            writer.writerow(data.values())
         return f"Weather in {data['city']}\n" \
                f"Country: {data['country']}\n" \
                f"State: {data['state']}\n" \
