@@ -1,22 +1,26 @@
-import requests
+from requests import get
+from src.compas import direction
 from typing import Optional, Union
+import datetime
 
 
-def weather_data(city, appid: Union[dict, str]) -> Optional[dict]:
-    call = requests.get("https://api.openweathermap.org/data/2.5/weather?"
-                        f"lat={city['lat']}&lon={city['lon']}&"
-                        f"appid={appid}&"
-                        "units=metric&")
+def weather_data(city: dict, appid: str) -> Optional[dict]:
+    call = get("https://api.openweathermap.org/data/2.5/weather?"
+               f"lat={city['lat']}&lon={city['lon']}&"
+               f"appid={appid}&"
+               "units=metric&")
     data = call.json()
     if data['cod'] != 200:
         return None
     else:
-        d = {'city': city['name'],
-             'country': city['country'],
+        d = {'datetime': datetime.datetime.now(datetime.timezone.utc),
+             'provider': 'openweather',
+             'city': city['name'],
              'state': city['state'],
+             'country': city['country'],
              'temp': data['main']['temp'],
-             'humidity': data['main']['humidity'],
-             'windspd': data['wind']['speed'],
+             'hum': data['main']['humidity'],
+             'winddir': direction(data['wind']['deg']),
              'winddeg': data['wind']['deg'],
-             'provider': 'Open Weather'}
+             'windspeed': data['wind']['speed']}
         return d
