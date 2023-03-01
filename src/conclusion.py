@@ -1,17 +1,18 @@
 import csv
 import os.path
 from src.compas import direction
+from typing import Optional
 
 
-def printing(data, out_name: [dict, str]) -> str:
+def printing(data, out_name: [Optional[dict], str]) -> str:
     if data is None:
         return "Please, check api key"
     else:
-        text = None if os.path.exists(out_name) else data.keys()
+        headers = None if os.path.exists(out_name) else data.keys()
         with open(out_name, "a", newline='') as f:
             writer = csv.writer(f)
-            if text is not None:
-                writer.writerow(text)
+            if headers is not None:
+                writer.writerow(headers)
             writer.writerow(data.values())
         return f"Weather in {data['city']}\n" \
                f"Country: {data['country']}\n" \
