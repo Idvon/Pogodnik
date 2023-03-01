@@ -4,7 +4,7 @@ from typing import Optional, Union
 import datetime
 
 
-def weather_data(city, appid: Union[dict, str]) -> Optional[dict]:
+def weather_data(city: dict, appid: str) -> Optional[dict]:
     call = get("https://api.openweathermap.org/data/2.5/weather?"
                f"lat={city['lat']}&lon={city['lon']}&"
                f"appid={appid}&"

@@ -4,7 +4,7 @@ from src.compas import direction
 from typing import Optional
 
 
-def printing(data, out_name: [Optional[dict], str]) -> str:
+def printing(data: Optional[dict], out_name: str) -> str:
     if data is None:
         return "Please, check api key"
     else:
