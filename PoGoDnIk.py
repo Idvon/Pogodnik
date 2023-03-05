@@ -1,10 +1,9 @@
-import json
-import toml
 import argparse
-from src import open_weather
-from src import open_meteo
-from src.conclusion import printing
-from src.geocoding import geo
+from src.weather_providers import open_weather
+from src.weather_providers import open_meteo
+from src.output import conclusion
+from src.geo_providers import geocoding
+from src.config_file_parser import file_parser
 
 
 def main():
@@ -12,21 +11,16 @@ def main():
     parser.add_argument("--config", type=str)
     parser.add_argument("--output", type=str)
     args = parser.parse_args()
-    with open(args.config) as f:
-        if args.config.endswith("json"):
-            config_data = json.load(f)
-        elif args.config.endswith("toml"):
-            config_data = toml.load(f)
-    geo_data = {'city_name': config_data['city_name'],
-                'api_key': config_data['geo_provider']['api_key']}
-    city = geo(geo_data)
+    parser = file_parser.create_parser(args.config)  # parser = JSONParser()
+    city = geocoding.geo(parser.get_geo_config())
+    weather_config = parser.get_weather_config()
     if city is None:
         return "This city is not found. Please, check city name"
-    elif config_data['weather_provider']['name'] == "openweather":
-        appid = config_data['weather_provider']['api_key']
-        return printing(open_weather.weather_data(city, appid), args.output)
-    elif config_data['weather_provider']['name'] == "openmeteo":
-        return printing(open_meteo.weather_data(city), args.output)
+    elif weather_config['provider'] == "openweather":
+        appid = weather_config['api_key']
+        return conclusion.printing(open_weather.weather_data(city, appid), args.output)
+    elif weather_config['weather_provider']['name'] == "openmeteo":
+        return conclusion.printing(open_meteo.weather_data(city), args.output)
     else:
         return "Please, check provider name"
 

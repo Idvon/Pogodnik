@@ -1,9 +1,9 @@
 import requests
 import json
-from typing import Optional
+from typing import Union
 
 
-def geo(geo_data: dict) -> Optional[dict]:
+def geo(geo_data: dict) -> Union[dict, str]:
     call_city = requests.get("https://api.openweathermap.org/geo/1.0/direct?"
                              f"q={geo_data['city_name']}&"
                              f"appid={geo_data['api_key']}")

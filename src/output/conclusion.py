@@ -1,6 +1,6 @@
 import csv
 import os.path
-from src.compas import direction
+from src.output import compas
 from typing import Optional
 
 
@@ -20,5 +20,5 @@ def printing(data: Optional[dict], out_name: str) -> str:
                f"Temperature: {data['temp']} \N{degree sign}C\n" \
                f"Humidity: {data['hum']} %\n" \
                f"Wind speed: {data['windspeed']} m/s\n" \
-               f"Wind direction: {direction(data['winddeg'])}\n" \
+               f"Wind direction: {compas.direction(data['winddeg'])}\n" \
                f"By {data['provider']}"

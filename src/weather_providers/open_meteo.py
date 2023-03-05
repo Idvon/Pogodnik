@@ -1,5 +1,5 @@
 from requests import get
-from src.compas import direction
+from src.output import compas
 import datetime
 
 
@@ -20,7 +20,7 @@ def weather_data(city: dict) -> dict:
          'country': city['country'],
          'temp': data['current_weather']['temperature'],
          'hum': data['hourly']['relativehumidity_2m'][index_humidity],
-         'winddir': direction(int(data['current_weather']['winddirection'])),
+         'winddir': compas.direction(int(data['current_weather']['winddirection'])),
          'winddeg': int(data['current_weather']['winddirection']),
          'windspeed': data['current_weather']['windspeed']}
     return d
