@@ -1,9 +1,9 @@
 import argparse
-from src.weather_providers import open_weather
-from src.weather_providers import open_meteo
+from src.weather import open_weather
+from src.weather import open_meteo
 from src.output import conclusion
-from src.geo_providers import geocoding
-from src.config_file_parser import file_parser
+from src.geo.geocoding import geo
+from src.config_file_parser.file_parser import create_parser
 
 
 def main():
@@ -11,18 +11,19 @@ def main():
     parser.add_argument("--config", type=str)
     parser.add_argument("--output", type=str)
     args = parser.parse_args()
-    parser = file_parser.create_parser(args.config)  # parser = JSONParser()
-    city = geocoding.geo(parser.get_geo_config())
+    parser = create_parser(args.config)  # call parser
+    city_data = geo(parser.get_geo_config()).get_coords()  # call geo_providers data
     weather_config = parser.get_weather_config()
-    if city is None:
-        return "This city is not found. Please, check city name"
-    elif weather_config['provider'] == "openweather":
-        appid = weather_config['api_key']
-        return conclusion.printing(open_weather.weather_data(city, appid), args.output)
-    elif weather_config['weather_provider']['name'] == "openmeteo":
-        return conclusion.printing(open_meteo.weather_data(city), args.output)
+    if type(city_data) is str:
+        return city_data
     else:
-        return "Please, check provider name"
+        if weather_config['provider'] == "openweather":
+            appid = weather_config['api_key']
+            return conclusion.printing(open_weather.weather_data(city_data, appid), args.output)
+        elif weather_config['provider'] == "openmeteo":
+            return conclusion.printing(open_meteo.weather_data(city_data), args.output)
+        else:
+            return "Please, check provider name"
 
 
 if __name__ == "__main__":
