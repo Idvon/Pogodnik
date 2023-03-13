@@ -29,9 +29,11 @@ class TOMLParser(ConfigFileParser):
         self.config = toml.load(f)  # load toml from f(file)
 
 
+extensions = {'.json': JSONParser,
+              '.toml': TOMLParser}
+
+
 def create_parser(file_name: str) -> ConfigFileParser:
-    extensions = {'.json': JSONParser,
-                  '.toml': TOMLParser}
     extension = pathlib.Path(file_name).suffix
     if extension in extensions.keys():
         with open(file_name) as f:

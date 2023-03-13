@@ -32,8 +32,10 @@ class OpenWeatherGeoProvider(GeoProvider):
             self.config = "key"
 
 
+extensions = {'openweather': OpenWeatherGeoProvider}
+
+
 def geo(geo_config: dict) -> GeoProvider:
-    extensions = {'openweather': OpenWeatherGeoProvider}
     extension = geo_config['provider']
     if extension in extensions.keys():
         return extensions[extension](geo_config)
