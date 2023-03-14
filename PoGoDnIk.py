@@ -17,15 +17,17 @@ def main():
             config_data = json.load(f)
         elif args.config.endswith("toml"):
             config_data = toml.load(f)
-    geo_data = {'city_name': config_data['city_name'],
-                'api_key': config_data['geo_provider']['api_key']}
+    geo_data = {
+        "city_name": config_data["city_name"],
+        "api_key": config_data["geo_provider"]["api_key"],
+    }
     city = geo(geo_data)
     if city is None:
         return "This city is not found. Please, check city name"
-    elif config_data['weather_provider']['name'] == "openweather":
-        appid = config_data['weather_provider']['api_key']
+    elif config_data["weather_provider"]["name"] == "openweather":
+        appid = config_data["weather_provider"]["api_key"]
         return printing(open_weather.weather_data(city, appid), args.output)
-    elif config_data['weather_provider']['name'] == "openmeteo":
+    elif config_data["weather_provider"]["name"] == "openmeteo":
         return printing(open_meteo.weather_data(city), args.output)
     else:
         return "Please, check provider name"
