@@ -1,6 +1,6 @@
 from requests import get
-from src.compas import direction
-from typing import Optional, Union
+from src.output import compas
+from typing import Optional
 import datetime
 
 
@@ -20,7 +20,7 @@ def weather_data(city: dict, appid: str) -> Optional[dict]:
              'country': city['country'],
              'temp': data['main']['temp'],
              'hum': data['main']['humidity'],
-             'winddir': direction(data['wind']['deg']),
+             'winddir': compas.direction(data['wind']['deg']),
              'winddeg': data['wind']['deg'],
              'windspeed': data['wind']['speed']}
         return d

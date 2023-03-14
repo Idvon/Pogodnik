@@ -1,10 +1,9 @@
-import json
-import toml
 import argparse
-from src import open_weather
-from src import open_meteo
-from src.conclusion import printing
-from src.geocoding import geo
+from src.weather import open_weather
+from src.weather import open_meteo
+from src.output import conclusion
+from src.geo.geocoding import geo
+from src.config_file_parser.file_parser import create_parser
 
 
 def main():
@@ -12,23 +11,19 @@ def main():
     parser.add_argument("--config", type=str)
     parser.add_argument("--output", type=str)
     args = parser.parse_args()
-    with open(args.config) as f:
-        if args.config.endswith("json"):
-            config_data = json.load(f)
-        elif args.config.endswith("toml"):
-            config_data = toml.load(f)
-    geo_data = {'city_name': config_data['city_name'],
-                'api_key': config_data['geo_provider']['api_key']}
-    city = geo(geo_data)
-    if city is None:
-        return "This city is not found. Please, check city name"
-    elif config_data['weather_provider']['name'] == "openweather":
-        appid = config_data['weather_provider']['api_key']
-        return printing(open_weather.weather_data(city, appid), args.output)
-    elif config_data['weather_provider']['name'] == "openmeteo":
-        return printing(open_meteo.weather_data(city), args.output)
+    parser = create_parser(args.config)  # call parser
+    city_data = geo(parser.get_geo_config()).get_coords()  # call geo_providers data
+    weather_config = parser.get_weather_config()
+    if type(city_data) is str:
+        return city_data
     else:
-        return "Please, check provider name"
+        if weather_config['provider'] == "openweather":
+            appid = weather_config['api_key']
+            return conclusion.printing(open_weather.weather_data(city_data, appid), args.output)
+        elif weather_config['provider'] == "openmeteo":
+            return conclusion.printing(open_meteo.weather_data(city_data), args.output)
+        else:
+            return "Please, check provider name"
 
 
 if __name__ == "__main__":
