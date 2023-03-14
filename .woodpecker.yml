@@ -1,0 +1,7 @@
+pipeline:
+  linters:
+    image: python:3.10-alpine
+    commands:
+      - poetry install
+      - poetry run black --check .
+      - poetry run isort --check .
