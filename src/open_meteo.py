@@ -1,6 +1,8 @@
-from requests import get
-from src.compas import direction
 import datetime
+
+from requests import get
+
+from src.compas import direction
 
 
 def weather_data(city: dict) -> dict:

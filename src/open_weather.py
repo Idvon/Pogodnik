@@ -1,7 +1,9 @@
-from requests import get
-from src.compas import direction
-from typing import Optional, Union
 import datetime
+from typing import Optional, Union
+
+from requests import get
+
+from src.compas import direction
 
 
 def weather_data(city: dict, appid: str) -> Optional[dict]:
