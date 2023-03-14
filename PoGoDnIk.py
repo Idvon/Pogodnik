@@ -1,9 +1,8 @@
-import argparse
 import json
-
 import toml
-
-from src import open_meteo, open_weather
+import argparse
+from src import open_weather
+from src import open_meteo
 from src.conclusion import printing
 from src.geocoding import geo
 

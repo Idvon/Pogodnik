@@ -1,7 +1,6 @@
+import requests
 import json
 from typing import Optional
-
-import requests
 
 
 def geo(geo_data: dict) -> Optional[dict]:

@@ -1,8 +1,7 @@
 import csv
 import os.path
-from typing import Optional
-
 from src.compas import direction
+from typing import Optional
 
 
 def printing(data: Optional[dict], out_name: str) -> str:
