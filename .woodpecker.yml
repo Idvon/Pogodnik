@@ -1,14 +1,13 @@
 variables:
-  - &pogodnik_image git.wearentsa.me/dd/pogodnik:${CI_COMMIT_SOURCE_BRANCH}
+  - &pogodnik_image git.wearentsa.me/dd/pogodnik:ci
 
 pipeline:
 
-  # publish:
-  #   image: woodpeckerci/plugin-docker-buildx
-  #   secrets: [docker_username, docker_password]
-  #   settings:
-  #     repo: git.wearentsa.me/dd/pogodnik
-  #     tag: ${CI_COMMIT_SOURCE_BRANCH}
+  publish:
+    image: woodpeckerci/plugin-docker-buildx
+    secrets: [docker_username, docker_password]
+    settings:
+      repo: *pogodnik_image
 
   black:
     group: linters
