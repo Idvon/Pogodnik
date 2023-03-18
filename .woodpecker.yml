@@ -1,18 +1,18 @@
 pipeline:
   black:
     group: linters
-    image: git.wearentsa.me/dd/pogonik:add_linters
+    image: git.wearentsa.me/dd/pogodnik:add_linters
     commands:
       - poetry run black --check .
 
   isort:
     group: linters
-    image: git.wearentsa.me/dd/pogonik:add_linters
+    image: git.wearentsa.me/dd/pogodnik:add_linters
     commands:
       - poetry run isort --check .
 
   mypy:
     group: linters
-    image: git.wearentsa.me/dd/pogonik:add_linters
+    image: git.wearentsa.me/dd/pogodnik:add_linters
     commands:
       - poetry run mypy *.py
