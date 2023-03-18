@@ -5,13 +5,10 @@ pipeline:
 
   publish:
     image: woodpeckerci/plugin-docker-buildx
+    secrets: [docker_username, docker_password]
     settings:
       repo: git.wearentsa.me/dd/pogodnik
       tag: ci
-      username:
-        from_secret: docker_username
-      password:
-        from_secret: docker_password
 
   black:
     group: linters
