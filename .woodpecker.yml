@@ -7,9 +7,9 @@ pipeline:
     image: woodpeckerci/plugin-docker-buildx
     settings:
       repo: git.wearentsa.me/dd/pogodnik
+      registry: git.wearentsa.me
       tag: ci
-      username:
-        from_secret: docker_username
+      username: ${CI_REPO_OWNER}
       password:
         from_secret: docker_password
 
