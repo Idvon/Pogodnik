@@ -2,9 +2,10 @@ pipeline:
 
   publish:
     image: woodpeckerci/plugin-docker-buildx
+    secrets: [docker_username, docker_password]
     settings:
       repo: git.wearentsa.me/dd/pogodnik
-      tags: ${CI_COMMIT_SOURCE_BRANCH}
+      tag: ${CI_COMMIT_SOURCE_BRANCH}
 
   black:
     group: linters
