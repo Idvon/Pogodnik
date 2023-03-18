@@ -1,18 +1,24 @@
 pipeline:
+
+  publish:
+    image: woodpeckerci/plugin-docker-buildx
+    settings:
+      repo: git.wearentsa.me/dd/pogodnik:${CI_COMMIT_SOURCE_BRANCH}
+
   black:
     group: linters
-    image: git.wearentsa.me/dd/pogodnik:add_linters
+    image: git.wearentsa.me/dd/pogodnik:${CI_COMMIT_SOURCE_BRANCH}
     commands:
       - poetry run black --check .
 
   isort:
     group: linters
-    image: git.wearentsa.me/dd/pogodnik:add_linters
+    image: git.wearentsa.me/dd/pogodnik:${CI_COMMIT_SOURCE_BRANCH}
     commands:
       - poetry run isort --check .
 
   mypy:
     group: linters
-    image: git.wearentsa.me/dd/pogodnik:add_linters
+    image: git.wearentsa.me/dd/pogodnik:${CI_COMMIT_SOURCE_BRANCH}
     commands:
       - poetry run mypy PoGoDnIk.py src/
