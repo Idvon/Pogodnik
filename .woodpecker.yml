@@ -8,7 +8,7 @@ pipeline:
 
   black:
     group: linters
-    image: git.wearentsa.me/dd/pogodnik:${CI_COMMIT_SOURCE_BRANCH}
+    image: "git.wearentsa.me/dd/pogodnik:${CI_COMMIT_SOURCE_BRANCH}"
     commands:
       - poetry run black --check .
 
