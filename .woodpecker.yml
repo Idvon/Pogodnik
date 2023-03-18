@@ -12,6 +12,8 @@ pipeline:
       username: ${CI_REPO_OWNER}
       password:
         from_secret: docker_password
+    when:
+      path: "poetry.lock"
 
   black:
     group: linters
