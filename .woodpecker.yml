@@ -7,7 +7,8 @@ pipeline:
     image: woodpeckerci/plugin-docker-buildx
     secrets: [docker_username, docker_password]
     settings:
-      repo: *pogodnik_image
+      repo: git.wearentsa.me/dd/pogodnik
+      tag: ci
 
   black:
     group: linters
