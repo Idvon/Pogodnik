@@ -1,8 +1,34 @@
+variables:
+  - &pogodnik_image git.wearentsa.me/dd/pogodnik:ci
+
 pipeline:
-  linters:
-    image: python:3.10-alpine
+
+  publish:
+    image: woodpeckerci/plugin-docker-buildx
+    settings:
+      repo: git.wearentsa.me/dd/pogodnik
+      registry: git.wearentsa.me
+      tag: ci
+      username: ${CI_REPO_OWNER}
+      password:
+        from_secret: docker_password
+    when:
+      path: "poetry.lock"
+
+  black:
+    group: linters
+    image: *pogodnik_image
     commands:
-      - pip install poetry
-      - poetry install
       - poetry run black --check .
+
+  isort:
+    group: linters
+    image: *pogodnik_image
+    commands:
       - poetry run isort --check .
+
+  mypy:
+    group: linters
+    image: *pogodnik_image
+    commands:
+      - poetry run mypy PoGoDnIk.py src/
