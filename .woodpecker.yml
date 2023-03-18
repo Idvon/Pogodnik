@@ -8,18 +8,24 @@ pipeline:
 
   black:
     group: linters
-    image: git.wearentsa.me/dd/pogodnik:${CI_COMMIT_SOURCE_BRANCH}
+    image: git.wearentsa.me/dd/pogodnik
+    settings:
+      tags: ${CI_COMMIT_SOURCE_BRANCH}
     commands:
       - poetry run black --check .
 
   isort:
     group: linters
-    image: git.wearentsa.me/dd/pogodnik:${CI_COMMIT_SOURCE_BRANCH}
+    image: git.wearentsa.me/dd/pogodnik
+    settings:
+      tags: ${CI_COMMIT_SOURCE_BRANCH}
     commands:
       - poetry run isort --check .
 
   mypy:
     group: linters
-    image: git.wearentsa.me/dd/pogodnik:${CI_COMMIT_SOURCE_BRANCH}
+    image: git.wearentsa.me/dd/pogodnik
+    settings:
+      tags: ${CI_COMMIT_SOURCE_BRANCH}
     commands:
       - poetry run mypy PoGoDnIk.py src/
