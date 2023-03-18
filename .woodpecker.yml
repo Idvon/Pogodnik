@@ -15,4 +15,5 @@ pipeline:
     group: linters
     image: git.wearentsa.me/dd/pogodnik:add_linters
     commands:
+      - ls -lla
       - poetry run mypy /app/*.py
