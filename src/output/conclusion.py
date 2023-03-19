@@ -1,17 +1,16 @@
 import csv
 import datetime
 from pathlib import Path
-from typing import Optional
 
 
-def printing(geo_data, weather_data: Optional[dict], out_name: str) -> str:
+def printing(geo_data: dict, weather_data: dict, out_name: str) -> str:
     date = {"datetime": datetime.datetime.now(datetime.timezone.utc)}
     data = date | weather_data | geo_data
-    col = None if Path(out_name).is_file() else data.keys()
+    headers = None if Path(out_name).is_file() else data.keys()
     with open(out_name, "a", newline="") as f:
         writer = csv.writer(f)
-        if col is not None:
-            writer.writerow(col)
+        if headers is not None:
+            writer.writerow(headers)
         writer.writerow(data.values())
     return (
         f"Weather in {data['city']}\n"

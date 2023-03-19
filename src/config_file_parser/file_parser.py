@@ -1,5 +1,6 @@
 import json
-from typing import Union
+from pathlib import Path
+from typing import Union, TextIO
 
 import toml
 
@@ -22,19 +23,22 @@ class ConfigFileParser:
 
 
 class JSONParser(ConfigFileParser):
-    def __init__(self, f: [Union[str, bytes]]):
+    def __init__(self, f: TextIO):
         self.config = json.load(f)  # load json from f(file)
 
 
 class TOMLParser(ConfigFileParser):
-    def __init__(self, f: [Union[str, bytes]]):
+    def __init__(self, f: TextIO):
         self.config = toml.load(f)  # load toml from f(file)
 
 
 EXTENSIONS = {".json": JSONParser, ".toml": TOMLParser}
 
 
-def create_parser(file_name: str, extension: str) -> ConfigFileParser:
+def create_parser(file_name: Path) -> Union[ConfigFileParser, str]:
+    extension = file_name.suffix
     if extension in EXTENSIONS.keys():
         with open(file_name) as f:
             return EXTENSIONS[extension](f)
+    else:
+        return "Please, check extension file"

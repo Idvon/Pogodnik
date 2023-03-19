@@ -12,10 +12,12 @@ def main():
     parser.add_argument("--config", type=str)
     parser.add_argument("--output", type=str)
     args = parser.parse_args()
-    if not Path(args.config).is_file():
+    file_config = Path(args.config)
+    if not file_config.is_file():
         return "Config file not found"
-    extension = Path(args.config).suffix
-    config_parser = create_parser(args.config, extension)  # parser call to write config
+    config_parser = create_parser(file_config)  # parser call to write config
+    if isinstance(config_parser, str):
+        return config_parser
     geo_config = create_geo_provider(config_parser.get_geo_config())  # init geo config
     if isinstance(geo_config, str):
         return geo_config

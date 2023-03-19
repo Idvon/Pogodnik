@@ -1,5 +1,5 @@
 import json
-from typing import Optional, Union
+from typing import Union, Optional, SupportsIndex
 
 from requests import get
 
@@ -15,7 +15,7 @@ class GeoProvider:
         else:
             return {"lat": self.config["lat"], "lon": self.config["lon"]}
 
-    def get_city_data(self):
+    def get_city_data(self) -> dict:
         return {
             "city": self.config["name"],
             "state": self.config["state"],
