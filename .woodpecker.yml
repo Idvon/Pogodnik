@@ -14,7 +14,7 @@ pipeline:
         from_secret: docker_password
     when:
       path:
-        include: [ '.woodpecker.yml', 'poetry.lock', 'Dockerfile' ]
+        include: [ 'poetry.lock', 'Dockerfile' ]
 
   black:
     group: linters
@@ -37,7 +37,6 @@ pipeline:
   tests:
     image: *pogodnik_image
     commands:
-      - which coverage
       - python3 -m coverage
       - poetry run /usr/local/bin/coverage run -m pytest -v tests/
       - poetry run /usr/local/bin/coverage report -m
