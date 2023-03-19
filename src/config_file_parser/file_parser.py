@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Union, TextIO
+from typing import TextIO, Union
 
 import toml
 

@@ -1,16 +1,16 @@
 import json
-from typing import Union, Optional, SupportsIndex
+from typing import Union
 
 from requests import get
 
 
 class GeoProvider:
-    config: Union[dict, str, None]
+    config: dict
 
     def get_coords(self) -> Union[dict, str]:
-        if self.config is None:
+        if len(self.config) == 0:
             return "This city is not found. Please, check city name"
-        elif self.config == "key":
+        elif self.config.get("cod") is not None:
             return "Invalid API key. Please, check geo API key"
         else:
             return {"lat": self.config["lat"], "lon": self.config["lon"]}
@@ -32,9 +32,9 @@ class OpenWeatherGeoProvider(GeoProvider):
         )
         data = json.loads(call.text)
         if isinstance(data, list):
-            self.config = None if len(data) == 0 else data[0]
+            self.config = dict() if len(data) == 0 else data[0]
         else:
-            self.config = "key"
+            self.config = data
 
 
 PROVIDERS = {"openweather": OpenWeatherGeoProvider}
