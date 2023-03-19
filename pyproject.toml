@@ -31,4 +31,4 @@ line-length = 88
 target-version = ["py310"]
 
 [tool.coverage.run]
-source = ["src/", "PoGoDnIk.py"]
+source = ["src/"]
