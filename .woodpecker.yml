@@ -37,5 +37,5 @@ pipeline:
   tests:
     image: *pogodnik_image
     commands:
-      - poetry run coverage run -m pytest -v tests/
-      - poetry run coverage report -m
+      - poetry run /usr/local/bin/coverage run -m pytest -v tests/
+      - poetry run /usr/local/bin/coverage report -m
