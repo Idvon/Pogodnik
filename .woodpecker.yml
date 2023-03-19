@@ -13,7 +13,8 @@ pipeline:
       password:
         from_secret: docker_password
     when:
-      path: "poetry.lock"
+      path:
+        include: [ '.woodpecker.yml', 'poetry.lock', 'Dockerfile' ]
 
   black:
     group: linters

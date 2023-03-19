@@ -6,6 +6,6 @@ ENV POETRY_VERSION=1.1.12
 ENV PYTHONPATH=${PYTHONPATH}:${PWD} 
 RUN pip install "poetry==$POETRY_VERSION"
 RUN poetry config virtualenvs.create false
-RUN poetry install
+RUN poetry install --no-root
 COPY . /app
 ENTRYPOINT ["poetry", "run", "python3", "PoGoDnIk.py"]
