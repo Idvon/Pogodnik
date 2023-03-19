@@ -19,6 +19,7 @@ pipeline:
   black:
     group: linters
     image: *pogodnik_image
+    pull: true
     commands:
       - poetry run black --check .
 
@@ -37,6 +38,5 @@ pipeline:
   tests:
     image: *pogodnik_image
     commands:
-      - python3 -m coverage
-      - poetry run /usr/local/bin/coverage run -m pytest -v tests/
-      - poetry run /usr/local/bin/coverage report -m
+      - poetry run coverage run -m pytest -v tests/
+      - poetry run coverage report -m
