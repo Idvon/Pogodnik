@@ -1,7 +1,7 @@
-import json
 from pathlib import Path
 from typing import TextIO, Union
 
+import json
 import toml
 
 
@@ -19,6 +19,11 @@ class ConfigFileParser:
         return {
             "provider": self.config["weather_provider"]["name"],
             "api_key": self.config["weather_provider"]["api_key"],
+        }
+
+    def get_timeout(self) -> dict:
+        return {
+            "timeout": self.config["timeout"]
         }
 
 
