@@ -2,10 +2,10 @@
 "city_name": "Saint Petersburg",
 "weather_provider": {
   "name": "openweather",
-  "api_key": "your api key"
+  "api_key": "weather api key"
 },
 "geo_provider": {
   "name": "openweather",
-  "api_key": "your api key"
+  "api_key": "geo api key"
 }
 }
