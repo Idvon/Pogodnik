@@ -21,6 +21,9 @@ class ConfigFileParser:
             "api_key": self.config["weather_provider"]["api_key"],
         }
 
+    def get_timeout(self) -> dict:
+        return {"timeout": self.config["timeout"]}
+
 
 class JSONParser(ConfigFileParser):
     def __init__(self, f: TextIO):

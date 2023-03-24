@@ -1,3 +1,7 @@
+import csv
+import datetime
+from typing import Optional, Union
+
 from requests import get
 
 from src.output.compas import direction
@@ -7,10 +11,10 @@ class WeatherProvider:
     url: str
     data: dict
 
-    def request(self):
+    def request(self) -> Optional[dict]:
         return get(self.url).json()
 
-    def weather_data(self, call):
+    def weather_data(self, call) -> dict:
         return self.data
 
 
@@ -63,15 +67,42 @@ class OpenMeteoWeatherProvider(WeatherProvider):
         return super().weather_data(self.data)
 
 
-PROVIDERS = {
+class CSVWeatherProvider(WeatherProvider):
+    def __init__(self, file, timeout):
+        self.current_time = datetime.datetime.now(datetime.timezone.utc)
+        self.file = file
+        self.timeout = timeout
+
+    def request(self) -> Optional[dict]:
+        with open(self.file, "r", newline="") as f:
+            text = csv.DictReader(f)
+            for row in text:
+                pass
+            last_time = datetime.datetime.fromisoformat(row["datetime"])
+        delta = datetime.timedelta(seconds=self.timeout * 60)
+        if (self.current_time - last_time) <= delta:
+            return row
+        else:
+            return None
+
+
+NET_PROVIDERS = {
     "openweather": OpenWeatherWeatherProvider,
     "openmeteo": OpenMeteoWeatherProvider,
 }
+LOCAL_PROVIDERS = {".csv": CSVWeatherProvider}
 
 
-def create_weather_provider(weather_config, coords):
+def create_net_weather_provider(weather_config, coords) -> Union[WeatherProvider, str]:
     provider = weather_config["provider"]
-    if provider in PROVIDERS.keys():
-        return PROVIDERS[provider](weather_config, coords)
+    if provider in NET_PROVIDERS.keys():
+        return NET_PROVIDERS[provider](weather_config, coords)
     else:
         return "Please, check weather provider name"
+
+
+def create_local_weather_provider(file, timeout) -> Optional[WeatherProvider]:
+    provider = file.suffix
+    if provider in LOCAL_PROVIDERS.keys():
+        return LOCAL_PROVIDERS[provider](file, timeout)
+    return None
