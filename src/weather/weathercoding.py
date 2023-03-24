@@ -1,7 +1,8 @@
-import datetime
 import csv
+import datetime
+from typing import Optional, Union
+
 from requests import get
-from typing import Union
 
 from src.output.compas import direction
 
@@ -13,7 +14,7 @@ class WeatherProvider:
     def request(self):
         return get(self.url).json()
 
-    def weather_data(self, call):
+    def weather_data(self, call) -> dict:
         return self.data
 
 
@@ -72,15 +73,14 @@ class CSVWeatherProvider(WeatherProvider):
         self.file = file
         self.timeout = timeout
 
-    def request(self):
+    def request(self) -> Optional[dict]:
         with open(self.file, "r", newline="") as f:
             text = csv.DictReader(f)
             for row in text:
                 pass
             last_time = datetime.datetime.fromisoformat(row["datetime"])
-        print(row)
-        dif_time = self.current_time.minute - last_time.minute
-        if dif_time <= self.timeout:
+        dif_time = self.current_time - last_time
+        if (dif_time.days == 0) and ((dif_time.seconds // 60) <= self.timeout):
             return row
         else:
             return None
@@ -90,9 +90,7 @@ NET_PROVIDERS = {
     "openweather": OpenWeatherWeatherProvider,
     "openmeteo": OpenMeteoWeatherProvider,
 }
-LOCAL_PROVIDERS = {
-    ".csv": CSVWeatherProvider
-}
+LOCAL_PROVIDERS = {".csv": CSVWeatherProvider}
 
 
 def create_net_weather_provider(weather_config, coords) -> Union[WeatherProvider, str]:
@@ -103,7 +101,7 @@ def create_net_weather_provider(weather_config, coords) -> Union[WeatherProvider
         return "Please, check weather provider name"
 
 
-def create_local_weather_provider(file, timeout) -> WeatherProvider:
+def create_local_weather_provider(file, timeout) -> Optional[WeatherProvider]:
     provider = file.suffix
     if provider in LOCAL_PROVIDERS.keys():
         return LOCAL_PROVIDERS[provider](file, timeout)

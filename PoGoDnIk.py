@@ -4,7 +4,10 @@ from pathlib import Path
 from src.config_file_parser.file_parser import create_parser
 from src.geo.geocoding import create_geo_provider
 from src.output import conclusion
-from src.weather.weathercoding import create_net_weather_provider, create_local_weather_provider
+from src.weather.weathercoding import (
+    create_local_weather_provider,
+    create_net_weather_provider,
+)
 
 
 def main():
@@ -21,7 +24,8 @@ def main():
         return config_parser
     if file_out.is_file():
         timeout = int(config_parser.get_timeout()["timeout"])
-        cash = create_local_weather_provider(file_out, timeout)
+        local_weather_provider = create_local_weather_provider(file_out, timeout)
+        cash = local_weather_provider.request()
         if cash is not None:
             return conclusion.printing(cash)
     geo_config = create_geo_provider(config_parser.get_geo_config())  # init geo config
@@ -32,14 +36,15 @@ def main():
         return coords
     geo_data = geo_config.get_city_data()  # getting city data
     weather_config = config_parser.get_weather_config()  # init weather config
-    weather_provider = create_net_weather_provider(weather_config, coords)
-    if isinstance(weather_provider, str):
-        return weather_provider
-    weather_data = weather_provider.weather_data(weather_provider.request())
+    net_weather_provider = create_net_weather_provider(weather_config, coords)
+    if isinstance(net_weather_provider, str):
+        return net_weather_provider
+    weather_data = net_weather_provider.weather_data(net_weather_provider.request())
     if isinstance(weather_data, str):
         return weather_data
-    return (conclusion.printing(geo_data, weather_data),
-            conclusion.in_file(geo_data, weather_data, file_out))
+    city_data = weather_data | geo_data
+    conclusion.in_file(city_data, file_out)
+    return conclusion.printing(city_data)
 
 
 if __name__ == "__main__":
