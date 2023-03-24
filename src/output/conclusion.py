@@ -16,7 +16,7 @@ def printing(city_data: dict) -> str:
     )
 
 
-def in_file(city_data: dict, out_file: Path):
+def to_file(city_data: dict, out_file: Path):
     date = {"datetime": datetime.datetime.now(datetime.timezone.utc)}
     data = date | city_data
     headers = None if out_file.is_file() else data.keys()

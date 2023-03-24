@@ -43,7 +43,7 @@ def main():
     if isinstance(weather_data, str):
         return weather_data
     city_data = weather_data | geo_data
-    conclusion.in_file(city_data, file_out)
+    conclusion.to_file(city_data, file_out)
     return conclusion.printing(city_data)
 
 

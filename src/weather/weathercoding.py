@@ -11,7 +11,7 @@ class WeatherProvider:
     url: str
     data: dict
 
-    def request(self):
+    def request(self) -> Optional[dict]:
         return get(self.url).json()
 
     def weather_data(self, call) -> dict:
@@ -79,8 +79,8 @@ class CSVWeatherProvider(WeatherProvider):
             for row in text:
                 pass
             last_time = datetime.datetime.fromisoformat(row["datetime"])
-        dif_time = self.current_time - last_time
-        if (dif_time.days == 0) and ((dif_time.seconds // 60) <= self.timeout):
+        delta = datetime.timedelta(seconds=self.timeout * 60)
+        if (self.current_time - last_time) <= delta:
             return row
         else:
             return None
@@ -105,3 +105,4 @@ def create_local_weather_provider(file, timeout) -> Optional[WeatherProvider]:
     provider = file.suffix
     if provider in LOCAL_PROVIDERS.keys():
         return LOCAL_PROVIDERS[provider](file, timeout)
+    return None
