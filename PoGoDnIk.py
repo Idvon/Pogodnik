@@ -25,7 +25,7 @@ def main():
     if file_out.is_file():
         timeout = int(config_parser.get_timeout()["timeout"])
         local_weather_provider = create_local_weather_provider(file_out, timeout)
-        cash = local_weather_provider.request()
+        cash = local_weather_provider.weather_data()
         if cash is not None:
             return conclusion.printing(cash)
     geo_config = create_geo_provider(config_parser.get_geo_config())  # init geo config
