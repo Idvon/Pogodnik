@@ -1,3 +1,4 @@
+import abc
 import csv
 import datetime
 from typing import Optional, Union
@@ -7,14 +8,18 @@ from requests import get
 from src.output.compas import direction
 
 
-class WeatherProvider:
+class WeatherProvider(abc.ABC):
     url: str
     data: dict
 
     def request(self) -> Optional[dict]:
         return get(self.url).json()
 
-    def weather_data(self, call) -> dict:
+    @abc.abstractmethod
+    def weather_data(self, data) -> dict:
+        """
+        Process data and return weather structure
+        """
         return self.data
 
 
