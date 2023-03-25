@@ -35,7 +35,7 @@ class OpenWeatherWeatherProvider(WeatherProvider):
     def weather_data(self, response):
         if response["cod"] != 200:
             raise ProviderNoDataError("Please, check weather API key")
-        self.data = {
+        return {
             "provider": "openweather",
             "temp": response["main"]["temp"],
             "hum": response["main"]["humidity"],
@@ -43,7 +43,6 @@ class OpenWeatherWeatherProvider(WeatherProvider):
             "winddeg": response["wind"]["deg"],
             "windspeed": response["wind"]["speed"],
         }
-        return super().weather_data(self.data)
 
 
 class OpenMeteoWeatherProvider(WeatherProvider):
@@ -76,7 +75,7 @@ class CSVWeatherProvider(WeatherProvider):
         self.file = file
         self.timeout = timeout
 
-    def weather_data(self, _) -> dict:
+    def weather_data(self, _=None) -> dict:
         with open(self.file, "r", newline="") as f:
             text = csv.DictReader(f)
             for row in text:

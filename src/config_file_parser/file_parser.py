@@ -4,6 +4,8 @@ from typing import TextIO, Union
 
 import toml
 
+from src.exceptions import ProviderCreationError
+
 
 class ConfigFileParser:
     config: dict
@@ -38,10 +40,9 @@ class TOMLParser(ConfigFileParser):
 EXTENSIONS = {".json": JSONParser, ".toml": TOMLParser}
 
 
-def create_parser(file_name: Path) -> Union[ConfigFileParser, str]:
+def create_parser(file_name: Path) -> ConfigFileParser:
     extension = file_name.suffix
     if extension in EXTENSIONS.keys():
         with open(file_name) as f:
             return EXTENSIONS[extension](f)
-    else:
-        return "Please, check extension file"
+    raise ProviderCreationError("Please, check file extension")
