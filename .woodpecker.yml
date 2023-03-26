@@ -33,7 +33,7 @@ pipeline:
     group: linters
     image: *pogodnik_image
     commands:
-      - poetry run mypy PoGoDnIk.py src/ --explicit-package-bases --namespace-packages=True
+      - poetry run mypy PoGoDnIk.py src/ --explicit-package-bases
 
   tests:
     image: *pogodnik_image
