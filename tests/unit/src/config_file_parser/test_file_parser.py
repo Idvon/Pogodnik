@@ -1,15 +1,17 @@
 from pathlib import Path
 
+from pytest import raises
+
 from src.config_file_parser.file_parser import JSONParser, TOMLParser, create_parser
+from src.exceptions import ProviderCreationError
 
 json_parser = create_parser(Path("example_config.json"))
 toml_parser = create_parser(Path("example_config.toml"))
-errored_parser = create_parser(Path("booba.dooba"))
 
 
 def test_error_parser():
-    assert isinstance(errored_parser, str)
-    assert errored_parser == "Please, check extension file"
+    with raises(ProviderCreationError):
+        errored_parser = create_parser(Path("booba.dooba"))
 
 
 def test_json_geo_config():

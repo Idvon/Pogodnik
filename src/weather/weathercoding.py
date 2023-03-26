@@ -1,21 +1,26 @@
+import abc
 import csv
 import datetime
-from typing import Optional, Union
+from typing import Optional
 
 from requests import get
 
+from src.exceptions import ProviderCreationError, ProviderNoDataError
 from src.output.compas import direction
 
 
-class WeatherProvider:
+class WeatherProvider(abc.ABC):
     url: str
-    data: dict
 
     def request(self) -> Optional[dict]:
         return get(self.url).json()
 
-    def weather_data(self, call) -> dict:
-        return self.data
+    @abc.abstractmethod
+    def weather_data(self, response) -> dict:
+        """
+        Parse response and return data structure
+        """
+        return {}
 
 
 class OpenWeatherWeatherProvider(WeatherProvider):
@@ -27,19 +32,17 @@ class OpenWeatherWeatherProvider(WeatherProvider):
             "units=metric&"
         )
 
-    def weather_data(self, call):
-        if call["cod"] != 200:
-            return "Please, check weather API key"
-        else:
-            self.data = {
-                "provider": "openweather",
-                "temp": call["main"]["temp"],
-                "hum": call["main"]["humidity"],
-                "winddir": direction(call["wind"]["deg"]),
-                "winddeg": call["wind"]["deg"],
-                "windspeed": call["wind"]["speed"],
-            }
-            return super().weather_data(self.data)
+    def weather_data(self, response):
+        if response["cod"] != 200:
+            raise ProviderNoDataError("Please, check weather API key")
+        return {
+            "provider": "openweather",
+            "temp": response["main"]["temp"],
+            "hum": response["main"]["humidity"],
+            "winddir": direction(response["wind"]["deg"]),
+            "winddeg": response["wind"]["deg"],
+            "windspeed": response["wind"]["speed"],
+        }
 
 
 class OpenMeteoWeatherProvider(WeatherProvider):
@@ -52,19 +55,18 @@ class OpenMeteoWeatherProvider(WeatherProvider):
             "hourly=relativehumidity_2m"
         )
 
-    def weather_data(self, call):
-        current_time = call["current_weather"]["time"]
-        list_time = call["hourly"]["time"]
+    def weather_data(self, response):
+        current_time = response["current_weather"]["time"]
+        list_time = response["hourly"]["time"]
         index_humidity = list_time.index(current_time)
-        self.data = {
+        return {
             "provider": "openmeteo",
-            "temp": call["current_weather"]["temperature"],
-            "hum": call["hourly"]["relativehumidity_2m"][index_humidity],
-            "winddir": direction(int(call["current_weather"]["winddirection"])),
-            "winddeg": int(call["current_weather"]["winddirection"]),
-            "windspeed": call["current_weather"]["windspeed"],
+            "temp": response["current_weather"]["temperature"],
+            "hum": response["hourly"]["relativehumidity_2m"][index_humidity],
+            "winddir": direction(int(response["current_weather"]["winddirection"])),
+            "winddeg": int(response["current_weather"]["winddirection"]),
+            "windspeed": response["current_weather"]["windspeed"],
         }
-        return super().weather_data(self.data)
 
 
 class CSVWeatherProvider(WeatherProvider):
@@ -73,7 +75,7 @@ class CSVWeatherProvider(WeatherProvider):
         self.file = file
         self.timeout = timeout
 
-    def request(self) -> Optional[dict]:
+    def weather_data(self, _=None) -> dict:
         with open(self.file, "r", newline="") as f:
             text = csv.DictReader(f)
             for row in text:
@@ -82,8 +84,7 @@ class CSVWeatherProvider(WeatherProvider):
         delta = datetime.timedelta(seconds=self.timeout * 60)
         if (self.current_time - last_time) <= delta:
             return row
-        else:
-            return None
+        raise ProviderNoDataError("No data found in cache")
 
 
 NET_PROVIDERS = {
@@ -93,16 +94,16 @@ NET_PROVIDERS = {
 LOCAL_PROVIDERS = {".csv": CSVWeatherProvider}
 
 
-def create_net_weather_provider(weather_config, coords) -> Union[WeatherProvider, str]:
+def create_net_weather_provider(weather_config, coords) -> WeatherProvider:
     provider = weather_config["provider"]
     if provider in NET_PROVIDERS.keys():
         return NET_PROVIDERS[provider](weather_config, coords)
-    else:
-        return "Please, check weather provider name"
+    raise ProviderCreationError("Please, check weather provider name")
 
 
-def create_local_weather_provider(file, timeout) -> Optional[WeatherProvider]:
+# TODO: unify with previous function
+def create_local_weather_provider(file, timeout) -> CSVWeatherProvider:
     provider = file.suffix
     if provider in LOCAL_PROVIDERS.keys():
         return LOCAL_PROVIDERS[provider](file, timeout)
-    return None
+    raise ProviderCreationError("No local provider available")

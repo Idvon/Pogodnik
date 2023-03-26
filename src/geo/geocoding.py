@@ -1,19 +1,21 @@
 import json
-from typing import Union
 
 from requests import get
+
+from src.exceptions import ProviderCreationError, ProviderNoDataError
 
 
 class GeoProvider:
     config: dict
 
-    def get_coords(self) -> Union[dict, str]:
+    def get_coords(self) -> dict:
         if len(self.config) == 0:
-            return "This city is not found. Please, check city name"
-        elif self.config.get("cod") is not None:
-            return "Invalid API key. Please, check geo API key"
-        else:
-            return {"lat": self.config["lat"], "lon": self.config["lon"]}
+            raise ProviderCreationError(
+                "This city is not found. Please, check city name"
+            )
+        if self.config.get("cod") is not None:
+            raise ProviderNoDataError("Please, check weather API key")
+        return {"lat": self.config["lat"], "lon": self.config["lon"]}
 
     def get_city_data(self) -> dict:
         return {
@@ -40,9 +42,8 @@ class OpenWeatherGeoProvider(GeoProvider):
 PROVIDERS = {"openweather": OpenWeatherGeoProvider}
 
 
-def create_geo_provider(geo_config: dict) -> Union[GeoProvider, str]:
+def create_geo_provider(geo_config: dict) -> GeoProvider:
     provider = geo_config["provider"]
     if provider in PROVIDERS.keys():
         return PROVIDERS[provider](geo_config)
-    else:
-        return "Please, check geo provider name"
+    raise ProviderCreationError("Please, check geo provider name")
