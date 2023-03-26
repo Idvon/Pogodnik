@@ -53,3 +53,24 @@ OM_RESPONSE = {
         "relativehumidity_2m": [82, 83, 86],
     },
 }
+GEOCODING_RESPONSE = [
+    {
+        "name": "London",
+        "local_names": {
+            # bla bla
+        },
+        "lat": 51.5085,
+        "lon": -0.1257,
+        "country": "GB",
+    },
+    {
+        "name": "London",
+        "local_names": {
+            # bla bla
+        },
+        "lat": 42.9834,
+        "lon": -81.233,
+        "country": "CA",
+    },
+]
+GEOCODING_ERROR_RESPONSE = {"cod": 429}

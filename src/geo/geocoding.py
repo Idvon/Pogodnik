@@ -1,5 +1,3 @@
-import json
-
 from requests import get
 
 from src.exceptions import ProviderCreationError, ProviderNoDataError
@@ -10,9 +8,7 @@ class GeoProvider:
 
     def get_coords(self) -> dict:
         if len(self.config) == 0:
-            raise ProviderCreationError(
-                "This city is not found. Please, check city name"
-            )
+            raise ProviderNoDataError("This city is not found. Please, check city name")
         if self.config.get("cod") is not None:
             raise ProviderNoDataError("Please, check geo API key")
         return {"lat": self.config["lat"], "lon": self.config["lon"]}
@@ -20,19 +16,19 @@ class GeoProvider:
     def get_city_data(self) -> dict:
         return {
             "city": self.config["name"],
-            "state": self.config["state"],
+            "state": self.config.get("state", ""),
             "country": self.config["country"],
         }
 
 
 class OpenWeatherGeoProvider(GeoProvider):
     def __init__(self, geo_config: dict):
-        call = get(
+        response = get(
             "https://api.openweathermap.org/geo/1.0/direct?"
             f"q={geo_config['city_name']}&"
             f"appid={geo_config['api_key']}"
         )
-        data = json.loads(call.text)
+        data = response.json()
         if isinstance(data, list):
             self.config = dict() if len(data) == 0 else data[0]
         else:
