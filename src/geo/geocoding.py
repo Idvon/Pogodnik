@@ -14,7 +14,7 @@ class GeoProvider:
                 "This city is not found. Please, check city name"
             )
         if self.config.get("cod") is not None:
-            raise ProviderNoDataError("Please, check weather API key")
+            raise ProviderNoDataError("Please, check geo API key")
         return {"lat": self.config["lat"], "lon": self.config["lon"]}
 
     def get_city_data(self) -> dict:
