@@ -23,11 +23,9 @@ class GeoProvider:
 
 class OpenWeatherGeoProvider(GeoProvider):
     def __init__(self, geo_config: dict):
-        response = get(
-            "https://api.openweathermap.org/geo/1.0/direct?"
-            f"q={geo_config['city_name']}&"
-            f"appid={geo_config['api_key']}"
-        )
+        payload = {"q": geo_config["city_name"], "appid": geo_config["api_key"]}
+        url = "https://api.openweathermap.org/geo/1.0/direct"
+        response = get(url, params=payload)
         data = response.json()
         if isinstance(data, list):
             self.config = dict() if len(data) == 0 else data[0]

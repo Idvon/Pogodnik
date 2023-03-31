@@ -30,16 +30,20 @@ def main():
             return conclusion.printing(cache)
         except ProviderNoDataError:
             pass
+
     geo_config = create_geo_provider(config_parser.get_geo_config())
     coords = geo_config.get_coords()
     geo_data = geo_config.get_city_data()
+
     weather_config = config_parser.get_weather_config()
     net_weather_provider = create_net_weather_provider(weather_config, coords)
     weather_data = net_weather_provider.weather_data(net_weather_provider.request())
+
     city_data = weather_data | geo_data
     conclusion.to_file(city_data, file_out)
+    conclusion.sql_file(city_data)
     return conclusion.printing(city_data)
 
 
 if __name__ == "__main__":
-    print(main())
+    main()

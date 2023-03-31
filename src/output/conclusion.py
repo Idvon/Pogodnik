@@ -4,8 +4,8 @@ import sqlite3
 from pathlib import Path
 
 
-def printing(city_data: dict) -> str:
-    return (
+def printing(city_data: dict) -> None:
+    print(
         f"Weather in {city_data['city']}\n"
         f"Country: {city_data['country']}\n"
         f"State: {city_data['state']}\n"
@@ -17,7 +17,7 @@ def printing(city_data: dict) -> str:
     )
 
 
-def to_file(city_data: dict, out_file: Path):
+def to_file(city_data: dict, out_file: Path) -> None:
     date = {"datetime": datetime.datetime.now(datetime.timezone.utc)}
     data = date | city_data
     headers = None if out_file.is_file() else data.keys()
@@ -28,51 +28,34 @@ def to_file(city_data: dict, out_file: Path):
         writer.writerow(data.values())
 
 
-def sql_file(city_data: dict):
+def sql_file(city_data: dict) -> None:
     file = "db.sqlite3"
     date = {"datetime": datetime.datetime.now(datetime.timezone.utc)}
     data = date | city_data
-    data = tuple(data.values())
-    print(data)
-    print(type(data))
+    values = tuple(data.values())
     try:
         sqlite_connection = sqlite3.connect(file)
-        headers = "create table if not exists weather_results (" \
-                  "date date," \
-                  "provider text," \
-                  "temp real," \
-                  "hum integer," \
-                  "winddir text," \
-                  "winddeg integer," \
-                  "windspeed real," \
-                  "city text," \
-                  "state text," \
-                  "country text);"
+        headers = (
+            "create table if not exists weather_results ("
+            "datetime date,"
+            "provider text,"
+            "temp real,"
+            "hum integer,"
+            "winddir text,"
+            "winddeg integer,"
+            "windspeed real,"
+            "city text,"
+            "state text,"
+            "country text)"
+        )
         cursor = sqlite_connection.cursor()
-        print("DB connect to SQLite")
         cursor.execute(headers)
-        cursor.execute("insert into weather_results(date, provider, temp, hum, winddir, winddeg, windspeed, city, state, country)"
-                       "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
+        cursor.execute(
+            "insert into weather_results values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", values
+        )
         sqlite_connection.commit()
-        print("DB creation")
         cursor.close()
     except sqlite3.Error as error:
         print(f"Error connecting to DB {error}")
     finally:
-        if (sqlite_connection):
-            sqlite_connection.close()
-            print("Connecting with SQLite close")
-
-
-if __name__ == "__main__":
-    q = {"datetime": datetime.datetime.fromisoformat("2023-03-26 15:56:47.080217+00:00"),
-         "provider": "openweather",
-         "temp": 2.04,
-         "hum": 93,
-         "winddir": "NE",
-         "winddeg": 50,
-         "windspeed": 4,
-         "city": "Saint Petersburg",
-         "state": "Saint Petersburg",
-         "country": "RU"}
-    sql_file(q)
+        sqlite_connection.close()
