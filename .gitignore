@@ -1,4 +1,5 @@
 *.json
 *.toml
 *.csv
+*.sqlite3
 .coverage
