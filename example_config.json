@@ -1,6 +1,6 @@
 {
 "city_name": "Saint Petersburg",
-"timeout": 30,
+"timeout": 0,
 "weather_provider": {
   "name": "openweather",
   "api_key": "weather api key"

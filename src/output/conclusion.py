@@ -28,30 +28,29 @@ def to_file(city_data: dict, out_file: Path) -> None:
         writer.writerow(data.values())
 
 
-def sql_file(city_data: dict) -> None:
-    file = "db.sqlite3"
+def sql_file(city_data: dict, db_file: Path) -> None:
     date = {"datetime": datetime.datetime.now(datetime.timezone.utc)}
     data = date | city_data
     values = tuple(data.values())
     try:
-        sqlite_connection = sqlite3.connect(file)
-        headers = (
-            "create table if not exists weather_results ("
-            "datetime date,"
-            "provider text,"
-            "temp real,"
-            "hum integer,"
-            "winddir text,"
-            "winddeg integer,"
-            "windspeed real,"
-            "city text,"
-            "state text,"
-            "country text)"
-        )
+        sqlite_connection = sqlite3.connect(db_file)
+        headers = """
+            CREATE TABLE if not exists weather_results (
+            datetime date,
+            provider text,
+            temp real,
+            hum integer,
+            winddir text,
+            winddeg integer,
+            windspeed real,
+            city text,
+            state text,
+            country text)
+        """
         cursor = sqlite_connection.cursor()
         cursor.execute(headers)
         cursor.execute(
-            "insert into weather_results values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", values
+            "INSERT INTO weather_results VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", values
         )
         sqlite_connection.commit()
         cursor.close()

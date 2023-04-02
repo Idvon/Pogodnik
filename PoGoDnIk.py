@@ -18,6 +18,7 @@ def main():
     args = parser.parse_args()
     file_config = Path(args.config)
     file_out = Path(args.output)
+    file_db = Path("db.sqlite3")
     if not file_config.is_file():
         raise FileNotFoundError("Config file not found")
     config_parser = create_parser(file_config)
@@ -41,7 +42,7 @@ def main():
 
     city_data = weather_data | geo_data
     conclusion.to_file(city_data, file_out)
-    conclusion.sql_file(city_data)
+    conclusion.sql_file(city_data, file_db)
     return conclusion.printing(city_data)
 
 

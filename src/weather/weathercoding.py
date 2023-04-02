@@ -81,7 +81,6 @@ class CSVWeatherProvider(WeatherProvider):
     def weather_data(self, _=None) -> dict:
         with open(self.file, "r", newline="") as f:
             text = csv.DictReader(f)
-            row = dict()
             for row in text:
                 pass
             last_time = datetime.datetime.fromisoformat(row["datetime"])
