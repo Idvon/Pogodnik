@@ -80,9 +80,8 @@ class CSVWeatherProvider(WeatherProvider):
 
     def weather_data(self, _=None) -> dict:
         with open(self.file, "r", newline="") as f:
-            text = csv.DictReader(f)
-            for row in text:
-                pass
+            text = [row for row in csv.DictReader(f)]
+            row = text[-1]
             last_time = datetime.datetime.fromisoformat(row["datetime"])
         delta = datetime.timedelta(seconds=self.timeout * 60)
         if (self.current_time - last_time) <= delta:
