@@ -4,7 +4,7 @@ from pathlib import Path
 from src.config_file_parser.file_parser import create_parser
 from src.exceptions import ProviderNoDataError
 from src.geo.geocoding import create_geo_provider
-from src.output import conclusion
+from src.output.conclusion import create_output_format, printing
 from src.weather.weathercoding import (
     create_local_weather_provider,
     create_net_weather_provider,
@@ -28,7 +28,7 @@ def main():
         local_weather_provider = create_local_weather_provider(file_out, timeout)
         try:
             cache = local_weather_provider.weather_data()
-            return conclusion.printing(cache)
+            return printing(cache)
         except ProviderNoDataError:
             pass
 
@@ -41,9 +41,9 @@ def main():
     weather_data = net_weather_provider.weather_data(net_weather_provider.request())
 
     city_data = weather_data | geo_data
-    conclusion.to_file(city_data, file_out)
-    conclusion.sql_file(city_data, file_db)
-    return conclusion.printing(city_data)
+    create_output_format(city_data, file_out).weather_outputs(city_data, file_out)
+    create_output_format(city_data, file_db).weather_outputs(city_data, file_db)
+    return printing(city_data)
 
 
 if __name__ == "__main__":
