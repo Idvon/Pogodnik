@@ -11,18 +11,17 @@ class WeatherData(abc.ABC):
     def __init__(self, city_data: dict, file_out: Path):
         self.city_data = city_data
         self.file_out = file_out
-        print(1)
 
     @abc.abstractmethod
-    def weather_outputs(self, city_data, file_out) -> dict:
+    def weather_outputs(self) -> dict:
         """
         Data retrieval and output in different file formats
         """
         return {}
 
 
-class ToCSVFile(WeatherData):
-    def weather_outputs(self, city_data, file_out):
+class CSVFileWriter(WeatherData):
+    def weather_outputs(self):
         headers = None if self.file_out.is_file() else self.city_data.keys()
         with open(self.file_out, "a", newline="") as f:
             writer = csv.writer(f)
@@ -31,13 +30,13 @@ class ToCSVFile(WeatherData):
             writer.writerow(self.city_data.values())
 
 
-class ToDataBase(WeatherData):
-    def weather_outputs(self, city_data, file_out):
+class DatabaseWriter(WeatherData):
+    def weather_outputs(self):
         values = tuple(self.city_data.values())
         try:
             sqlite_connection = sqlite3.connect(self.file_out)
             headers = """
-                CREATE TABLE if not exists weather_results (
+                CREATE TABLE IF NOT EXISTS weather_results (
                 datetime date,
                 provider text,
                 temp real,
@@ -63,19 +62,19 @@ class ToDataBase(WeatherData):
             sqlite_connection.close()
 
 
-FORMATS = {".csv": ToCSVFile, ".sqlite3": ToDataBase}
+WRITER = {".csv": CSVFileWriter, ".sqlite3": DatabaseWriter}
 
 
 def create_output_format(city_data: dict, file_out: Path) -> WeatherData:
     date = {"datetime": datetime.datetime.now(datetime.timezone.utc)}
     city_data = date | city_data
     form = file_out.suffix
-    if form in FORMATS.keys():
-        return FORMATS[form](city_data, file_out)
+    if form in WRITER.keys():
+        return WRITER[form](city_data, file_out)
     raise ProviderCreationError("No local provider available")
 
 
-def printing(city_data: dict) -> None:
+def to_display(city_data: dict) -> None:
     print(
         f"Weather in {city_data['city']}\n"
         f"Country: {city_data['country']}\n"
