@@ -11,9 +11,10 @@ from src.output.compas import direction
 
 class WeatherProvider(abc.ABC):
     url: str
+    payload: dict
 
     def request(self) -> Optional[dict]:
-        return get(self.url).json()
+        return get(self.url, params=self.payload).json()
 
     @abc.abstractmethod
     def weather_data(self, response) -> dict:
@@ -25,12 +26,13 @@ class WeatherProvider(abc.ABC):
 
 class OpenWeatherWeatherProvider(WeatherProvider):
     def __init__(self, weather_config, coords):
-        self.url = (
-            "https://api.openweathermap.org/data/2.5/weather?"
-            f"lat={coords['lat']}&lon={coords['lon']}&"
-            f"appid={weather_config['api_key']}&"
-            "units=metric&"
-        )
+        self.payload = {
+            "lat": coords["lat"],
+            "lon": coords["lon"],
+            "appid": weather_config["api_key"],
+            "units": "metric",
+        }
+        self.url = "https://api.openweathermap.org/data/2.5/weather"
 
     def weather_data(self, response):
         if response["cod"] != 200:
@@ -47,13 +49,14 @@ class OpenWeatherWeatherProvider(WeatherProvider):
 
 class OpenMeteoWeatherProvider(WeatherProvider):
     def __init__(self, weather_config, coords):
-        self.url = (
-            "https://api.open-meteo.com/v1/forecast?"
-            f"latitude={coords['lat']}&longitude={coords['lon']}&"
-            "current_weather=true&"
-            "windspeed_unit=ms&"
-            "hourly=relativehumidity_2m"
-        )
+        self.payload = {
+            "latitude": coords["lat"],
+            "longitude": coords["lon"],
+            "current_weather": "true",
+            "windspeed_unit": "ms",
+            "hourly": "relativehumidity_2m",
+        }
+        self.url = "https://api.open-meteo.com/v1/forecast"
 
     def weather_data(self, response):
         current_time = response["current_weather"]["time"]
@@ -77,9 +80,8 @@ class CSVWeatherProvider(WeatherProvider):
 
     def weather_data(self, _=None) -> dict:
         with open(self.file, "r", newline="") as f:
-            text = csv.DictReader(f)
-            for row in text:
-                pass
+            text = [row for row in csv.DictReader(f)]
+            row = text[-1]
             last_time = datetime.datetime.fromisoformat(row["datetime"])
         delta = datetime.timedelta(seconds=self.timeout * 60)
         if (self.current_time - last_time) <= delta:

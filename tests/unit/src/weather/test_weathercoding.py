@@ -13,12 +13,12 @@ GET_PATH = "src.weather.weathercoding.get"
 
 @fixture
 def mock_openmeteo_get(mocker):
-    mocker.patch(GET_PATH, lambda _: MockResponse(OM_RESPONSE, 200))
+    mocker.patch(GET_PATH, lambda *args, **kwargs: MockResponse(OM_RESPONSE, 200))
 
 
 @fixture
 def mock_openweather_get(mocker):
-    mocker.patch(GET_PATH, lambda _: MockResponse(OW_RESPONSE, 200))
+    mocker.patch(GET_PATH, lambda *args, **kwargs: MockResponse(OW_RESPONSE, 200))
 
 
 def test_openweather_parsing(mock_openweather_get):
