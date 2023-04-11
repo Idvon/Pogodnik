@@ -10,17 +10,21 @@ GET_PATH = "src.geo.geocoding.get"
 
 @fixture
 def mock_geocoding_get(mocker):
-    mocker.patch(GET_PATH, lambda _: MockResponse(GEOCODING_RESPONSE, 200))
+    mocker.patch(
+        GET_PATH, lambda *args, **kwargs: MockResponse(GEOCODING_RESPONSE, 200)
+    )
 
 
 @fixture
 def mock_geocoding_api_error(mocker):
-    mocker.patch(GET_PATH, lambda _: MockResponse(GEOCODING_ERROR_RESPONSE, 404))
+    mocker.patch(
+        GET_PATH, lambda *args, **kwargs: MockResponse(GEOCODING_ERROR_RESPONSE, 404)
+    )
 
 
 @fixture
 def mock_geocoding_city_not_found(mocker):
-    mocker.patch(GET_PATH, lambda _: MockResponse([], 404))
+    mocker.patch(GET_PATH, lambda *args, **kwargs: MockResponse([], 404))
 
 
 def test_geocoding_parser(mock_geocoding_get):
