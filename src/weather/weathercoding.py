@@ -1,9 +1,10 @@
 import abc
 import csv
 import datetime
-from pathlib import Path
-from typing import Optional, NamedTuple
 from collections import namedtuple
+from pathlib import Path
+from typing import NamedTuple, Optional
+
 from requests import get
 
 from src.exceptions import ProviderCreationError, ProviderNoDataError
@@ -38,14 +39,16 @@ class OpenWeatherWeatherProvider(WeatherProvider):
     def weather_data(self, response):
         if response["cod"] != 200:
             raise ProviderNoDataError("Please, check weather API key")
-        return {
-            "provider": "openweather",
-            "temp": response["main"]["temp"],
-            "hum": response["main"]["humidity"],
-            "winddir": direction(response["wind"]["deg"]),
-            "winddeg": response["wind"]["deg"],
-            "windspeed": response["wind"]["speed"],
-        }
+        lst = ["provider", "temp", "hum", "winddir", "winddeg", "windspeed"]
+        weather_data = namedtuple("weather_data", lst)
+        return weather_data(
+            "openweather",
+            response["main"]["temp"],
+            response["main"]["humidity"],
+            direction(response["wind"]["deg"]),
+            response["wind"]["deg"],
+            response["wind"]["speed"],
+        )
 
 
 class OpenMeteoWeatherProvider(WeatherProvider):
@@ -81,14 +84,16 @@ class CSVWeatherProvider(WeatherProvider):
         self.file = file
         self.timeout = timeout
 
-    def weather_data(self, _=None) -> dict:
+    def weather_data(self, _=None) -> NamedTuple:
         with open(self.file, "r", newline="") as f:
             text = [row for row in csv.DictReader(f)]
             row = text[-1]
             last_time = datetime.datetime.fromisoformat(row["datetime"])
         delta = datetime.timedelta(seconds=self.timeout * 60)
         if (self.current_time - last_time) <= delta:
-            return row
+            lst = row.keys()
+            weather_data = namedtuple("weather_data", lst)
+            return weather_data._make(row.values())
         raise ProviderNoDataError("No data found in cache")
 
 
@@ -99,7 +104,9 @@ NET_PROVIDERS = {
 LOCAL_PROVIDERS = {".csv": CSVWeatherProvider}
 
 
-def create_net_weather_provider(weather_config: dict, coords: NamedTuple) -> WeatherProvider:
+def create_net_weather_provider(
+    weather_config: dict, coords: NamedTuple
+) -> WeatherProvider:
     provider = weather_config["provider"]
     if provider in NET_PROVIDERS.keys():
         return NET_PROVIDERS[provider](weather_config, coords)

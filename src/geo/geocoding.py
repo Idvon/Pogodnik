@@ -1,6 +1,8 @@
-from requests import get
-from typing import NamedTuple
 from collections import namedtuple
+from typing import NamedTuple
+
+from requests import get
+
 from src.exceptions import ProviderCreationError, ProviderNoDataError
 
 
@@ -18,10 +20,10 @@ class GeoProvider:
 
     def get_city_data(self) -> type(NamedTuple):
         lst = ["city", "state", "country"]
-        city_data = namedtuple("city_data", lst)
-        return city_data(self.config["name"],
-                         self.config.get("state", ""),
-                         self.config["country"])
+        geo_data = namedtuple("geo_data", lst)
+        return geo_data(
+            self.config["name"], self.config.get("state", ""), self.config["country"]
+        )
 
 
 class OpenWeatherGeoProvider(GeoProvider):

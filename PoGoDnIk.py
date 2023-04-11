@@ -1,4 +1,5 @@
 import argparse
+from collections import namedtuple
 from pathlib import Path
 
 from src.config_file_parser.file_parser import create_parser
@@ -40,7 +41,8 @@ def main():
     net_weather_provider = create_net_weather_provider(weather_config, coords)
     weather_data = net_weather_provider.weather_data(net_weather_provider.request())
 
-    city_data = weather_data + geo_data
+    city_data = namedtuple("city_data", weather_data._fields + geo_data._fields)
+    city_data = city_data(*weather_data, *geo_data)
     create_output_format(city_data, file_out).weather_outputs()
     create_output_format(city_data, file_db).weather_outputs()
     return to_display(city_data)
