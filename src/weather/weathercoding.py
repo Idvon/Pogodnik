@@ -1,8 +1,9 @@
 import abc
 import csv
 import datetime
-from typing import Optional
-
+from pathlib import Path
+from typing import Optional, NamedTuple
+from collections import namedtuple
 from requests import get
 
 from src.exceptions import ProviderCreationError, ProviderNoDataError
@@ -17,18 +18,18 @@ class WeatherProvider(abc.ABC):
         return get(self.url, params=self.payload).json()
 
     @abc.abstractmethod
-    def weather_data(self, response) -> dict:
+    def weather_data(self, response) -> type(NamedTuple):
         """
         Parse response and return data structure
         """
-        return {}
+        return namedtuple("weather_data", {})
 
 
 class OpenWeatherWeatherProvider(WeatherProvider):
-    def __init__(self, weather_config, coords):
+    def __init__(self, weather_config, coords: type(NamedTuple)):
         self.payload = {
-            "lat": coords["lat"],
-            "lon": coords["lon"],
+            "lat": coords.lat,
+            "lon": coords.lon,
             "appid": weather_config["api_key"],
             "units": "metric",
         }
@@ -48,10 +49,10 @@ class OpenWeatherWeatherProvider(WeatherProvider):
 
 
 class OpenMeteoWeatherProvider(WeatherProvider):
-    def __init__(self, weather_config, coords):
+    def __init__(self, weather_config, coords: type(NamedTuple)):
         self.payload = {
-            "latitude": coords["lat"],
-            "longitude": coords["lon"],
+            "latitude": coords.lat,
+            "longitude": coords.lon,
             "current_weather": "true",
             "windspeed_unit": "ms",
             "hourly": "relativehumidity_2m",
@@ -62,14 +63,16 @@ class OpenMeteoWeatherProvider(WeatherProvider):
         current_time = response["current_weather"]["time"]
         list_time = response["hourly"]["time"]
         index_humidity = list_time.index(current_time)
-        return {
-            "provider": "openmeteo",
-            "temp": response["current_weather"]["temperature"],
-            "hum": response["hourly"]["relativehumidity_2m"][index_humidity],
-            "winddir": direction(int(response["current_weather"]["winddirection"])),
-            "winddeg": int(response["current_weather"]["winddirection"]),
-            "windspeed": response["current_weather"]["windspeed"],
-        }
+        lst = ["provider", "temp", "hum", "winddir", "winddeg", "windspeed"]
+        weather_data = namedtuple("weather_data", lst)
+        return weather_data(
+            "openmeteo",
+            response["current_weather"]["temperature"],
+            response["hourly"]["relativehumidity_2m"][index_humidity],
+            direction(int(response["current_weather"]["winddirection"])),
+            int(response["current_weather"]["winddirection"]),
+            response["current_weather"]["windspeed"],
+        )
 
 
 class CSVWeatherProvider(WeatherProvider):
@@ -96,7 +99,7 @@ NET_PROVIDERS = {
 LOCAL_PROVIDERS = {".csv": CSVWeatherProvider}
 
 
-def create_net_weather_provider(weather_config, coords) -> WeatherProvider:
+def create_net_weather_provider(weather_config: dict, coords: NamedTuple) -> WeatherProvider:
     provider = weather_config["provider"]
     if provider in NET_PROVIDERS.keys():
         return NET_PROVIDERS[provider](weather_config, coords)
@@ -104,7 +107,7 @@ def create_net_weather_provider(weather_config, coords) -> WeatherProvider:
 
 
 # TODO: unify with previous function
-def create_local_weather_provider(file, timeout) -> CSVWeatherProvider:
+def create_local_weather_provider(file: Path, timeout: int) -> CSVWeatherProvider:
     provider = file.suffix
     if provider in LOCAL_PROVIDERS.keys():
         return LOCAL_PROVIDERS[provider](file, timeout)

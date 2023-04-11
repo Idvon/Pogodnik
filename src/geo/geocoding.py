@@ -1,24 +1,27 @@
 from requests import get
-
+from typing import NamedTuple
+from collections import namedtuple
 from src.exceptions import ProviderCreationError, ProviderNoDataError
 
 
 class GeoProvider:
     config: dict
 
-    def get_coords(self) -> dict:
+    def get_coords(self) -> type(NamedTuple):
         if len(self.config) == 0:
             raise ProviderNoDataError("This city is not found. Please, check city name")
         if self.config.get("cod") is not None:
             raise ProviderNoDataError("Please, check geo API key")
-        return {"lat": self.config["lat"], "lon": self.config["lon"]}
+        lst = ["lat", "lon"]
+        coords = namedtuple("coords", lst)
+        return coords(self.config["lat"], self.config["lon"])
 
-    def get_city_data(self) -> dict:
-        return {
-            "city": self.config["name"],
-            "state": self.config.get("state", ""),
-            "country": self.config["country"],
-        }
+    def get_city_data(self) -> type(NamedTuple):
+        lst = ["city", "state", "country"]
+        city_data = namedtuple("city_data", lst)
+        return city_data(self.config["name"],
+                         self.config.get("state", ""),
+                         self.config["country"])
 
 
 class OpenWeatherGeoProvider(GeoProvider):

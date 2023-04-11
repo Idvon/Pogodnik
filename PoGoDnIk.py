@@ -40,7 +40,7 @@ def main():
     net_weather_provider = create_net_weather_provider(weather_config, coords)
     weather_data = net_weather_provider.weather_data(net_weather_provider.request())
 
-    city_data = weather_data | geo_data
+    city_data = weather_data + geo_data
     create_output_format(city_data, file_out).weather_outputs()
     create_output_format(city_data, file_db).weather_outputs()
     return to_display(city_data)
