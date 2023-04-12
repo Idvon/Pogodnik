@@ -75,14 +75,14 @@ def create_output_format(city_data: NamedTuple, file_out: Path) -> WeatherData:
 
 
 def to_display(city_data: NamedTuple) -> None:
-    city_data = city_data._asdict()
+    data = city_data._asdict()
     print(
-        f"Weather in {city_data['city']}\n"
-        f"Country: {city_data['country']}\n"
-        f"State: {city_data['state']}\n"
-        f"Temperature: {city_data['temp']} \N{degree sign}C\n"
-        f"Humidity: {city_data['hum']} %\n"
-        f"Wind speed: {city_data['windspeed']} m/s\n"
-        f"Wind direction: {city_data['winddir']}\n"
-        f"By {city_data['provider']}"
+        f"Weather in {data['city']}\n"
+        f"Country: {data['country']}\n"
+        f"State: {data['state']}\n"
+        f"Temperature: {data['temp']} \N{degree sign}C\n"
+        f"Humidity: {data['hum']} %\n"
+        f"Wind speed: {data['windspeed']} m/s\n"
+        f"Wind direction: {data['winddir']}\n"
+        f"By {data['provider']}"
     )

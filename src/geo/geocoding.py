@@ -9,18 +9,16 @@ from src.exceptions import ProviderCreationError, ProviderNoDataError
 class GeoProvider:
     config: dict
 
-    def get_coords(self) -> type(NamedTuple):
+    def get_coords(self) -> NamedTuple:
         if len(self.config) == 0:
             raise ProviderNoDataError("This city is not found. Please, check city name")
         if self.config.get("cod") is not None:
             raise ProviderNoDataError("Please, check geo API key")
-        lst = ["lat", "lon"]
-        coords = namedtuple("coords", lst)
+        coords = namedtuple("coords", ["lat", "lon"])
         return coords(self.config["lat"], self.config["lon"])
 
-    def get_city_data(self) -> type(NamedTuple):
-        lst = ["city", "state", "country"]
-        geo_data = namedtuple("geo_data", lst)
+    def get_city_data(self) -> NamedTuple:
+        geo_data = namedtuple("geo_data", ["city", "state", "country"])
         return geo_data(
             self.config["name"], self.config.get("state", ""), self.config["country"]
         )

@@ -19,7 +19,7 @@ class WeatherProvider(abc.ABC):
         return get(self.url, params=self.payload).json()
 
     @abc.abstractmethod
-    def weather_data(self, response) -> type(NamedTuple):
+    def weather_data(self, response) -> NamedTuple:
         """
         Parse response and return data structure
         """
@@ -27,7 +27,7 @@ class WeatherProvider(abc.ABC):
 
 
 class OpenWeatherWeatherProvider(WeatherProvider):
-    def __init__(self, weather_config, coords: type(NamedTuple)):
+    def __init__(self, weather_config, coords: NamedTuple):
         self.payload = {
             "lat": coords.lat,
             "lon": coords.lon,
@@ -52,7 +52,7 @@ class OpenWeatherWeatherProvider(WeatherProvider):
 
 
 class OpenMeteoWeatherProvider(WeatherProvider):
-    def __init__(self, weather_config, coords: type(NamedTuple)):
+    def __init__(self, weather_config, coords: NamedTuple):
         self.payload = {
             "latitude": coords.lat,
             "longitude": coords.lon,
@@ -91,8 +91,7 @@ class CSVWeatherProvider(WeatherProvider):
             last_time = datetime.datetime.fromisoformat(row["datetime"])
         delta = datetime.timedelta(seconds=self.timeout * 60)
         if (self.current_time - last_time) <= delta:
-            lst = row.keys()
-            weather_data = namedtuple("weather_data", lst)
+            weather_data = namedtuple("weather_data", row.keys())
             return weather_data._make(row.values())
         raise ProviderNoDataError("No data found in cache")
 
