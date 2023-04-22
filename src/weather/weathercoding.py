@@ -1,6 +1,6 @@
 import abc
-import csv
 import datetime
+import sqlite3
 from collections import namedtuple
 from pathlib import Path
 from typing import NamedTuple, Optional
@@ -9,45 +9,34 @@ from requests import get
 
 from src.config_file_parser.file_parser import WeatherConfig
 from src.exceptions import ProviderCreationError, ProviderNoDataError
-from src.geo.geocoding import Coords
+from src.geo.geocoding import Coords, GeoData
 from src.output.compas import direction
 
 
-class NetWeatherData(NamedTuple):
+class WeatherData(NamedTuple):
+    datetime: datetime.datetime
     provider: str
     temp: float
     hum: int
     winddir: str
     winddeg: int
     windspeed: float
-
-
-class LocalWeatherData(NamedTuple):
-    datetime: str
-    provider: str
-    temp: float
-    hum: int
-    winddir: str
-    winddeg: int
-    windspeed: float
-    city: str
-    state: str
-    country: str
 
 
 class WeatherProvider(abc.ABC):
     url: str
     payload: dict
+    date: datetime.datetime = datetime.datetime.now(datetime.timezone.utc)
 
     def request(self) -> Optional[dict]:
         return get(self.url, params=self.payload).json()
 
     @abc.abstractmethod
-    def weather_data(self, response: Optional[dict]) -> NetWeatherData:
+    def weather_data(self, response: Optional[dict]) -> WeatherData:
         """
         Parse response and return data structure
         """
-        return NetWeatherData._make({})
+        return WeatherData._make({})
 
 
 class OpenWeatherWeatherProvider(WeatherProvider):
@@ -60,10 +49,11 @@ class OpenWeatherWeatherProvider(WeatherProvider):
         }
         self.url = "https://api.openweathermap.org/data/2.5/weather"
 
-    def weather_data(self, response: Optional[dict]):
+    def weather_data(self, response):
         if response["cod"] != 200:
             raise ProviderNoDataError("Please, check weather API key")
-        return NetWeatherData(
+        return WeatherData(
+            WeatherProvider.date,
             "openweather",
             response["main"]["temp"],
             response["main"]["humidity"],
@@ -84,11 +74,12 @@ class OpenMeteoWeatherProvider(WeatherProvider):
         }
         self.url = "https://api.open-meteo.com/v1/forecast"
 
-    def weather_data(self, response: Optional[dict]):
+    def weather_data(self, response):
         current_time = response["current_weather"]["time"]
         list_time = response["hourly"]["time"]
         index_humidity = list_time.index(current_time)
-        return NetWeatherData(
+        return WeatherData(
+            WeatherProvider.date,
             "openmeteo",
             response["current_weather"]["temperature"],
             response["hourly"]["relativehumidity_2m"][index_humidity],
@@ -98,20 +89,52 @@ class OpenMeteoWeatherProvider(WeatherProvider):
         )
 
 
-class CSVWeatherProvider(WeatherProvider):
-    def __init__(self, file: Path, timeout: int):
+class DBWeatherProvider(WeatherProvider):
+    def __init__(self, file: Path, city: str, timeout: int):
         self.current_time = datetime.datetime.now(datetime.timezone.utc)
         self.file = file
         self.timeout = timeout
+        self.city = city
 
-    def weather_data(self, _=None) -> LocalWeatherData:
-        with open(self.file, "r", newline="") as f:
-            text = list(csv.DictReader(f))
-            row = text[-1]
-            last_time = datetime.datetime.fromisoformat(row["datetime"])
+    def weather_data(self, _=None):
         delta = datetime.timedelta(seconds=self.timeout * 60)
+        try:
+            sqlite_connection = sqlite3.connect(self.file)
+            cursor = sqlite_connection.cursor()
+            cursor.execute(
+                """
+                SELECT
+                datetime,
+                provider,
+                temp,
+                hum,
+                winddir,
+                winddeg,
+                windspeed,
+                city,
+                state,
+                country
+                FROM weather_results WHERE city = ?
+                """,
+                (self.city,),
+            )
+            row = cursor.fetchall()
+            data = row[-1]
+            weather_data = WeatherData(
+                data[0], data[1], data[2], data[3], data[4], data[5], data[6]
+            )
+            geo_data = GeoData(data[7], data[8], data[9])
+            cursor.close()
+        except sqlite3.Error as error:
+            print(f"Error connecting to DB {error}")
+        finally:
+            sqlite_connection.close()
+        last_time = datetime.datetime.fromisoformat(weather_data.datetime)
         if (self.current_time - last_time) <= delta:
-            return LocalWeatherData._make(row.values())
+            city_data = *weather_data, *geo_data
+            fields = weather_data._fields + geo_data._fields
+            CityData = namedtuple("CityData", fields)
+            return CityData._make(city_data)
         raise ProviderNoDataError("No data found in cache")
 
 
@@ -119,7 +142,7 @@ NET_PROVIDERS = {
     "openweather": OpenWeatherWeatherProvider,
     "openmeteo": OpenMeteoWeatherProvider,
 }
-LOCAL_PROVIDERS = {".csv": CSVWeatherProvider}
+LOCAL_PROVIDERS = {".sqlite3": DBWeatherProvider}
 
 
 def create_net_weather_provider(
@@ -132,8 +155,10 @@ def create_net_weather_provider(
 
 
 # TODO: unify with previous function
-def create_local_weather_provider(file: Path, timeout: int) -> CSVWeatherProvider:
+def create_local_weather_provider(
+    file: Path, city: str, timeout: int
+) -> DBWeatherProvider:
     provider = file.suffix
     if provider in LOCAL_PROVIDERS.keys():
-        return LOCAL_PROVIDERS[provider](file, timeout)
+        return LOCAL_PROVIDERS[provider](file, city, timeout)
     raise ProviderCreationError("No local provider available")

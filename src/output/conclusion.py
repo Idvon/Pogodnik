@@ -1,6 +1,5 @@
 import abc
 import csv
-import datetime
 import sqlite3
 from pathlib import Path
 from typing import NamedTuple
@@ -10,8 +9,7 @@ from src.exceptions import ProviderCreationError
 
 class WeatherData(abc.ABC):
     def __init__(self, city_data: NamedTuple, file_out: Path):
-        date = {"datetime": datetime.datetime.now(datetime.timezone.utc)}
-        self.city_data = date | city_data._asdict()
+        self.city_data = city_data._asdict()
         self.file_out = file_out
 
     @abc.abstractmethod

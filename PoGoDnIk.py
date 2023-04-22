@@ -1,5 +1,5 @@
 import argparse
-from collections import namedtuple
+import datetime
 from pathlib import Path
 from typing import NamedTuple
 
@@ -14,6 +14,7 @@ from src.weather.weathercoding import (
 
 
 class CityData(NamedTuple):
+    datetime: datetime.datetime
     provider: str
     temp: float
     hum: int
@@ -36,21 +37,24 @@ def main():
     if not file_config.is_file():
         raise FileNotFoundError("Config file not found")
     config_parser = create_parser(file_config)
+    geo_config = config_parser.get_geo_config()
+    weather_config = config_parser.get_weather_config()
 
-    if file_out.is_file():
+    if file_db.is_file():
         timeout = config_parser.get_timeout().timeout
-        local_weather_provider = create_local_weather_provider(file_out, timeout)
+        local_weather_provider = create_local_weather_provider(
+            file_db, geo_config.city_name, timeout
+        )
         try:
             cache = local_weather_provider.weather_data()
             return to_display(cache)
         except ProviderNoDataError:
             pass
 
-    geo_config = create_geo_provider(config_parser.get_geo_config())
-    coords = geo_config.get_coords()
-    geo_data = geo_config.get_city_data()
+    geo_provider = create_geo_provider(geo_config)
+    coords = geo_provider.get_coords()
+    geo_data = geo_provider.get_city_data()
 
-    weather_config = config_parser.get_weather_config()
     net_weather_provider = create_net_weather_provider(weather_config, coords)
     weather_data = net_weather_provider.weather_data(net_weather_provider.request())
 
