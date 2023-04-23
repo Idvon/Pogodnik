@@ -37,8 +37,7 @@ class OpenWeatherGeoProvider(GeoProvider):
     def __init__(self, geo_config: GeoConfig):
         payload = {"q": geo_config.city_name, "appid": geo_config.api_key}
         url = "https://api.openweathermap.org/geo/1.0/direct"
-        response = get(url, params=payload)
-        data = response.json()
+        data = get(url, params=payload).json()
         if isinstance(data, list):
             self.config = dict() if len(data) == 0 else data[0]
         else:

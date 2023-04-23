@@ -1,10 +1,15 @@
+import datetime
+from freezegun import freeze_time
 from pytest import fixture
 
 from src.weather.weathercoding import (
     OpenMeteoWeatherProvider,
     OpenWeatherWeatherProvider,
     create_net_weather_provider,
+    WeatherData
 )
+from src.config_file_parser.file_parser import WeatherConfig
+from src.geo.geocoding import Coords
 from tests.conftest import MockResponse
 from tests.unit.constants import COORDS, OM_RESPONSE, OW_RESPONSE
 
@@ -22,37 +27,40 @@ def mock_openweather_get(mocker):
 
 
 def test_openweather_parsing(mock_openweather_get):
-    provider = OpenWeatherWeatherProvider({"api_key": "beepboop"}, COORDS)
+    provider = OpenWeatherWeatherProvider(WeatherConfig, Coords)
     assert isinstance(provider, OpenWeatherWeatherProvider)
-    data = provider.weather_data(provider.request())
-    assert data == {
-        "provider": "openweather",
-        "temp": 298.48,  # hella hot
-        "hum": 64,
-        "winddir": "N",
-        "winddeg": 349,
-        "windspeed": 0.62,
-    }
+    with freeze_time("2023-01-01 00:00:00.000000+00:00"):
+        data = provider.weather_data(provider.request())
+        assert data == WeatherData(
+            datetime.datetime.now(datetime.timezone.utc),
+            "openweather",
+            298.48,  # hella hot
+            64,
+            "N",
+            349,
+            0.62,
+        )
 
 
 def test_openmeteo_parsing(mock_openmeteo_get):
-    provider = OpenMeteoWeatherProvider({}, COORDS)
+    provider = OpenMeteoWeatherProvider({}, Coords)
     assert isinstance(provider, OpenMeteoWeatherProvider)
     data = provider.weather_data(provider.request())
-    assert data == {
-        "provider": "openmeteo",
-        "temp": 2.4,
-        "hum": 86,
-        "winddir": "E",
-        "winddeg": 95,
-        "windspeed": 11.9,
-    }
+    assert data == WeatherData(
+        datetime.datetime,
+        "openmeteo",
+        2.4,
+        86,
+        "E",
+        95,
+        11.9,
+    )
 
 
 def test_net_provider_creation():
-    provider = create_net_weather_provider({"provider": "openmeteo"}, COORDS)
+    provider = create_net_weather_provider(WeatherConfig, Coords)
     assert isinstance(provider, OpenMeteoWeatherProvider)
     provider = create_net_weather_provider(
-        {"provider": "openweather", "api_key": "beepboop"}, COORDS
+        {"provider": "openweather", "api_key": "beepboop"}, Coords
     )
     assert isinstance(provider, OpenWeatherWeatherProvider)
