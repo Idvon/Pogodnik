@@ -1,15 +1,16 @@
 from datetime import datetime, timezone
+
 from freezegun import freeze_time
 from pytest import fixture
 
+from src.config_file_parser.file_parser import WeatherConfig
+from src.geo.geocoding import Coords
 from src.weather.weathercoding import (
     OpenMeteoWeatherProvider,
     OpenWeatherWeatherProvider,
+    WeatherData,
     create_net_weather_provider,
-    WeatherData
 )
-from src.config_file_parser.file_parser import WeatherConfig
-from src.geo.geocoding import Coords
 from tests.conftest import MockResponse
 from tests.unit.constants import COORDS, OM_RESPONSE, OW_RESPONSE
 

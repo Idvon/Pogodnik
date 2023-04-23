@@ -2,7 +2,14 @@ from pathlib import Path
 
 from pytest import raises
 
-from src.config_file_parser.file_parser import JSONParser, TOMLParser, create_parser, GeoConfig, WeatherConfig, Timeout
+from src.config_file_parser.file_parser import (
+    GeoConfig,
+    JSONParser,
+    Timeout,
+    TOMLParser,
+    WeatherConfig,
+    create_parser,
+)
 from src.exceptions import ProviderCreationError
 
 json_parser = create_parser(Path("example_config.json"))

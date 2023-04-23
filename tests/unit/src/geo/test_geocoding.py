@@ -2,7 +2,7 @@ from pytest import fixture, raises
 
 from src.config_file_parser.file_parser import GeoConfig
 from src.exceptions import ProviderNoDataError
-from src.geo.geocoding import OpenWeatherGeoProvider, GeoData, Coords
+from src.geo.geocoding import Coords, GeoData, OpenWeatherGeoProvider
 from tests.conftest import MockResponse
 from tests.unit.constants import GEOCODING_ERROR_RESPONSE, GEOCODING_RESPONSE
 
