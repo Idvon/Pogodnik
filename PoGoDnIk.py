@@ -1,5 +1,5 @@
 import argparse
-import datetime
+from datetime import datetime
 from pathlib import Path
 from typing import NamedTuple
 
@@ -14,7 +14,7 @@ from src.weather.weathercoding import (
 
 
 class CityData(NamedTuple):
-    datetime: datetime.datetime
+    datetime: datetime
     provider: str
     temp: float
     hum: int

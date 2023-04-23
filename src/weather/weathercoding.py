@@ -1,7 +1,7 @@
 import abc
-import datetime
 import sqlite3
 from collections import namedtuple
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import NamedTuple, Optional
 
@@ -14,7 +14,7 @@ from src.output.compas import direction
 
 
 class WeatherData(NamedTuple):
-    datetime: datetime.datetime
+    datetime: datetime
     provider: str
     temp: float
     hum: int
@@ -26,7 +26,6 @@ class WeatherData(NamedTuple):
 class WeatherProvider(abc.ABC):
     url: str
     payload: dict
-    date: datetime.datetime = datetime.datetime.now(datetime.timezone.utc)
 
     def request(self) -> Optional[dict]:
         return get(self.url, params=self.payload).json()
@@ -53,7 +52,7 @@ class OpenWeatherWeatherProvider(WeatherProvider):
         if response["cod"] != 200:
             raise ProviderNoDataError("Please, check weather API key")
         return WeatherData(
-            WeatherProvider.date,
+            datetime.now(timezone.utc),
             "openweather",
             response["main"]["temp"],
             response["main"]["humidity"],
@@ -79,7 +78,7 @@ class OpenMeteoWeatherProvider(WeatherProvider):
         list_time = response["hourly"]["time"]
         index_humidity = list_time.index(current_time)
         return WeatherData(
-            WeatherProvider.date,
+            datetime.now(timezone.utc),
             "openmeteo",
             response["current_weather"]["temperature"],
             response["hourly"]["relativehumidity_2m"][index_humidity],
@@ -91,13 +90,12 @@ class OpenMeteoWeatherProvider(WeatherProvider):
 
 class DBWeatherProvider(WeatherProvider):
     def __init__(self, file: Path, city: str, timeout: int):
-        self.current_time = datetime.datetime.now(datetime.timezone.utc)
         self.file = file
         self.timeout = timeout
         self.city = city
 
     def weather_data(self, _=None):
-        delta = datetime.timedelta(seconds=self.timeout * 60)
+        delta = timedelta(seconds=self.timeout * 60)
         try:
             sqlite_connection = sqlite3.connect(self.file)
             cursor = sqlite_connection.cursor()
@@ -129,8 +127,9 @@ class DBWeatherProvider(WeatherProvider):
             print(f"Error connecting to DB {error}")
         finally:
             sqlite_connection.close()
-        last_time = datetime.datetime.fromisoformat(weather_data.datetime)
-        if (self.current_time - last_time) <= delta:
+        current_time = datetime.now(timezone.utc)
+        last_time = datetime.fromisoformat(weather_data.datetime)
+        if (current_time - last_time) <= delta:
             city_data = *weather_data, *geo_data
             fields = weather_data._fields + geo_data._fields
             CityData = namedtuple("CityData", fields)
