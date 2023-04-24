@@ -1,7 +1,8 @@
 from pytest import fixture, raises
 
+from src.config_file_parser.file_parser import GeoConfig
 from src.exceptions import ProviderNoDataError
-from src.geo.geocoding import OpenWeatherGeoProvider
+from src.geo.geocoding import Coords, GeoData, OpenWeatherGeoProvider
 from tests.conftest import MockResponse
 from tests.unit.constants import GEOCODING_ERROR_RESPONSE, GEOCODING_RESPONSE
 
@@ -28,18 +29,18 @@ def mock_geocoding_city_not_found(mocker):
 
 
 def test_geocoding_parser(mock_geocoding_get):
-    provider = OpenWeatherGeoProvider({"api_key": "beepboop", "city_name": "Booberg"})
-    assert provider.get_city_data() == {"city": "London", "state": "", "country": "GB"}
-    assert provider.get_coords() == {"lat": 51.5085, "lon": -0.1257}
+    provider = OpenWeatherGeoProvider(GeoConfig)
+    assert provider.get_city_data() == GeoData("London", "", "GB")
+    assert provider.get_coords() == Coords(51.5085, -0.1257)
 
 
 def test_geocoding_city_not_found(mock_geocoding_city_not_found):
-    provider = OpenWeatherGeoProvider({"api_key": "beepboop", "city_name": "Booberg"})
+    provider = OpenWeatherGeoProvider(GeoConfig)
     with raises(ProviderNoDataError):
         provider.get_coords()
 
 
 def test_geocoding_api_error(mock_geocoding_api_error):
-    provider = OpenWeatherGeoProvider({"api_key": "beepboop", "city_name": "Booberg"})
+    provider = OpenWeatherGeoProvider(GeoConfig)
     with raises(ProviderNoDataError):
         provider.get_coords()
