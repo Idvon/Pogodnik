@@ -1,0 +1,34 @@
+from datetime import datetime
+from typing import NamedTuple
+
+
+class GeoConfig(NamedTuple):
+    city_name: str
+    provider: str
+    api_key: str
+
+
+class WeatherConfig(NamedTuple):
+    provider: str
+    api_key: str
+
+
+class GeoData(NamedTuple):
+    city: str
+    state: str
+    country: str
+
+
+class Coords(NamedTuple):
+    lat: float
+    lon: float
+
+
+class WeatherData(NamedTuple):
+    datetime: datetime
+    provider: str
+    temp: float
+    hum: int
+    winddir: str
+    winddeg: int
+    windspeed: float
