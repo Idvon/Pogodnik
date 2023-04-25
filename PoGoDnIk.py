@@ -1,7 +1,5 @@
 import argparse
-from datetime import datetime
 from pathlib import Path
-from typing import NamedTuple
 
 from src.config_file_parser.file_parser import create_parser
 from src.exceptions import ProviderNoDataError
@@ -11,19 +9,6 @@ from src.weather.weathercoding import (
     create_local_weather_provider,
     create_net_weather_provider,
 )
-
-
-class CityData(NamedTuple):
-    datetime: datetime
-    provider: str
-    temp: float
-    hum: int
-    winddir: str
-    winddeg: int
-    windspeed: float
-    city: str
-    state: str
-    country: str
 
 
 def main():
@@ -41,13 +26,13 @@ def main():
     weather_config = config_parser.get_weather_config()
 
     if file_db.is_file():
-        timeout = config_parser.get_timeout().timeout
+        timeout = config_parser.get_timeout()
         local_weather_provider = create_local_weather_provider(
             file_db, geo_config.city_name, timeout
         )
         try:
-            cache = local_weather_provider.weather_data()
-            return to_display(cache)
+            weather_cache, geo_cache = local_weather_provider.weather_data()
+            return to_display(weather_cache, geo_cache)
         except ProviderNoDataError:
             pass
 
@@ -58,11 +43,12 @@ def main():
     net_weather_provider = create_net_weather_provider(weather_config, coords)
     weather_data = net_weather_provider.weather_data(net_weather_provider.request())
 
-    data = *weather_data, *geo_data
-    city_data = CityData._make(data)
-    create_output_format(city_data, file_out).weather_outputs()
-    create_output_format(city_data, file_db).weather_outputs()
-    return to_display(city_data)
+    create_output_format(weather_data, geo_data, file_out).city_outputs()
+    create_output_format(weather_data, geo_data, file_db).city_outputs()
+    return to_display(
+        weather_data,
+        geo_data,
+    )
 
 
 if __name__ == "__main__":

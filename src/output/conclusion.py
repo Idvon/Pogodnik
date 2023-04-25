@@ -2,37 +2,40 @@ import abc
 import csv
 import sqlite3
 from pathlib import Path
-from typing import NamedTuple
 
 from src.exceptions import ProviderCreationError
+from src.structures import GeoData, WeatherData
 
 
-class WeatherData(abc.ABC):
-    def __init__(self, city_data: NamedTuple, file_out: Path):
-        self.city_data = city_data._asdict()
+class CityData(abc.ABC):
+    def __init__(self, weather_data: WeatherData, geo_data: GeoData, file_out: Path):
+        self.weather_data = weather_data
+        self.geo_data = geo_data
         self.file_out = file_out
 
     @abc.abstractmethod
-    def weather_outputs(self) -> dict:
+    def city_outputs(self) -> dict:
         """
         Data retrieval and output in different file formats
         """
         return {}
 
 
-class CSVFileWriter(WeatherData):
-    def weather_outputs(self):
-        headers = None if self.file_out.is_file() else self.city_data.keys()
+class CSVFileWriter(CityData):
+    def city_outputs(self):
+        headers = self.weather_data._fields + self.geo_data._fields
+        headers = None if self.file_out.is_file() else headers
         with open(self.file_out, "a", newline="") as f:
             writer = csv.writer(f)
             if headers is not None:
                 writer.writerow(headers)
-            writer.writerow(self.city_data.values())
+            values = *self.weather_data, *self.geo_data
+            writer.writerow(values)
 
 
-class DatabaseWriter(WeatherData):
-    def weather_outputs(self):
-        values = tuple(self.city_data.values())
+class DatabaseWriter(CityData):
+    def city_outputs(self):
+        values = *self.weather_data, *self.geo_data
         try:
             sqlite_connection = sqlite3.connect(self.file_out)
             headers = """
@@ -65,22 +68,23 @@ class DatabaseWriter(WeatherData):
 WRITER = {".csv": CSVFileWriter, ".sqlite3": DatabaseWriter}
 
 
-def create_output_format(city_data: NamedTuple, file_out: Path) -> WeatherData:
+def create_output_format(
+    weather_data: WeatherData, geo_data: GeoData, file_out: Path
+) -> CityData:
     form = file_out.suffix
     if form in WRITER.keys():
-        return WRITER[form](city_data, file_out)
+        return WRITER[form](weather_data, geo_data, file_out)
     raise ProviderCreationError("No local provider available")
 
 
-def to_display(city_data: NamedTuple) -> None:
-    data = city_data._asdict()
+def to_display(weather_data: WeatherData, geo_data: GeoData) -> None:
     print(
-        f"Weather in {data['city']}\n"
-        f"Country: {data['country']}\n"
-        f"State: {data['state']}\n"
-        f"Temperature: {data['temp']} \N{degree sign}C\n"
-        f"Humidity: {data['hum']} %\n"
-        f"Wind speed: {data['windspeed']} m/s\n"
-        f"Wind direction: {data['winddir']}\n"
-        f"By {data['provider']}"
+        f"Weather in {geo_data.city}\n"
+        f"Country: {geo_data.country}\n"
+        f"State: {geo_data.state}\n"
+        f"Temperature: {weather_data.temp} \N{degree sign}C\n"
+        f"Humidity: {weather_data.hum} %\n"
+        f"Wind speed: {weather_data.windspeed} m/s\n"
+        f"Wind direction: {weather_data.winddir}\n"
+        f"By {weather_data.provider}"
     )

@@ -12,7 +12,7 @@ from src.weather.weathercoding import (
     create_net_weather_provider,
 )
 from tests.conftest import MockResponse
-from tests.unit.constants import COORDS, OM_RESPONSE, OW_RESPONSE
+from tests.unit.constants import OM_RESPONSE, OW_RESPONSE
 
 GET_PATH = "src.weather.weathercoding.get"
 
