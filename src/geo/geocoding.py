@@ -1,20 +1,7 @@
-from typing import NamedTuple
-
 from requests import get
 
-from src.config_file_parser.file_parser import GeoConfig
 from src.exceptions import ProviderCreationError, ProviderNoDataError
-
-
-class GeoData(NamedTuple):
-    city: str
-    state: str
-    country: str
-
-
-class Coords(NamedTuple):
-    lat: float
-    lon: float
+from src.structures import Coords, GeoConfig, GeoData
 
 
 class GeoProvider:

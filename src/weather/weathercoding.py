@@ -1,26 +1,14 @@
 import abc
 import sqlite3
-from collections import namedtuple
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import NamedTuple, Optional
+from typing import Optional
 
 from requests import get
 
-from src.config_file_parser.file_parser import WeatherConfig
 from src.exceptions import ProviderCreationError, ProviderNoDataError
-from src.geo.geocoding import Coords, GeoData
 from src.output.compas import direction
-
-
-class WeatherData(NamedTuple):
-    datetime: datetime
-    provider: str
-    temp: float
-    hum: int
-    winddir: str
-    winddeg: int
-    windspeed: float
+from src.structures import Coords, GeoData, WeatherConfig, WeatherData
 
 
 class WeatherProvider(abc.ABC):
@@ -130,10 +118,7 @@ class DBWeatherProvider(WeatherProvider):
         current_time = datetime.now(timezone.utc)
         last_time = datetime.fromisoformat(weather_data.datetime)
         if (current_time - last_time) <= delta:
-            city_data = *weather_data, *geo_data
-            fields = weather_data._fields + geo_data._fields
-            CityData = namedtuple("CityData", fields)
-            return CityData._make(city_data)
+            return weather_data, geo_data
         raise ProviderNoDataError("No data found in cache")
 
 

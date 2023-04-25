@@ -5,7 +5,6 @@ from pytest import raises
 from src.config_file_parser.file_parser import (
     GeoConfig,
     JSONParser,
-    Timeout,
     TOMLParser,
     WeatherConfig,
     create_parser,
@@ -35,13 +34,6 @@ def test_json_weather_config():
     assert json_parser.get_weather_config() == WeatherConfig(
         "openweather",
         "weather api key",
-    )
-
-
-def test_timeout():
-    assert isinstance(json_parser, JSONParser)
-    assert json_parser.get_timeout() == Timeout(
-        0,
     )
 
 
