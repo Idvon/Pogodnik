@@ -1,15 +1,15 @@
 import abc
 import csv
-import datetime
 import sqlite3
 from pathlib import Path
+from typing import NamedTuple
 
 from src.exceptions import ProviderCreationError
 
 
 class WeatherData(abc.ABC):
-    def __init__(self, city_data: dict, file_out: Path):
-        self.city_data = city_data
+    def __init__(self, city_data: NamedTuple, file_out: Path):
+        self.city_data = city_data._asdict()
         self.file_out = file_out
 
     @abc.abstractmethod
@@ -65,23 +65,22 @@ class DatabaseWriter(WeatherData):
 WRITER = {".csv": CSVFileWriter, ".sqlite3": DatabaseWriter}
 
 
-def create_output_format(city_data: dict, file_out: Path) -> WeatherData:
-    date = {"datetime": datetime.datetime.now(datetime.timezone.utc)}
-    city_data = date | city_data
+def create_output_format(city_data: NamedTuple, file_out: Path) -> WeatherData:
     form = file_out.suffix
     if form in WRITER.keys():
         return WRITER[form](city_data, file_out)
     raise ProviderCreationError("No local provider available")
 
 
-def to_display(city_data: dict) -> None:
+def to_display(city_data: NamedTuple) -> None:
+    data = city_data._asdict()
     print(
-        f"Weather in {city_data['city']}\n"
-        f"Country: {city_data['country']}\n"
-        f"State: {city_data['state']}\n"
-        f"Temperature: {city_data['temp']} \N{degree sign}C\n"
-        f"Humidity: {city_data['hum']} %\n"
-        f"Wind speed: {city_data['windspeed']} m/s\n"
-        f"Wind direction: {city_data['winddir']}\n"
-        f"By {city_data['provider']}"
+        f"Weather in {data['city']}\n"
+        f"Country: {data['country']}\n"
+        f"State: {data['state']}\n"
+        f"Temperature: {data['temp']} \N{degree sign}C\n"
+        f"Humidity: {data['hum']} %\n"
+        f"Wind speed: {data['windspeed']} m/s\n"
+        f"Wind direction: {data['winddir']}\n"
+        f"By {data['provider']}"
     )

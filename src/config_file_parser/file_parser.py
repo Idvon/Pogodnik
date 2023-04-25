@@ -1,30 +1,45 @@
 import json
 from pathlib import Path
-from typing import TextIO
+from typing import NamedTuple, TextIO
 
 import toml
 
 from src.exceptions import ProviderCreationError
 
 
+class GeoConfig(NamedTuple):
+    city_name: str
+    provider: str
+    api_key: str
+
+
+class WeatherConfig(NamedTuple):
+    provider: str
+    api_key: str
+
+
+class Timeout(NamedTuple):
+    timeout: int
+
+
 class ConfigFileParser:
     config: dict
 
-    def get_geo_config(self) -> dict:  # formation of geo config
-        return {
-            "city_name": self.config["city_name"],
-            "provider": self.config["geo_provider"]["name"],
-            "api_key": self.config["geo_provider"]["api_key"],
-        }
+    def get_geo_config(self) -> GeoConfig:  # formation of geo config
+        return GeoConfig(
+            self.config["city_name"],
+            self.config["geo_provider"]["name"],
+            self.config["geo_provider"]["api_key"],
+        )
 
-    def get_weather_config(self) -> dict:  # formation of weather config
-        return {
-            "provider": self.config["weather_provider"]["name"],
-            "api_key": self.config["weather_provider"]["api_key"],
-        }
+    def get_weather_config(self) -> WeatherConfig:  # formation of weather config
+        return WeatherConfig(
+            self.config["weather_provider"]["name"],
+            self.config["weather_provider"]["api_key"],
+        )
 
-    def get_timeout(self) -> dict:
-        return {"timeout": self.config["timeout"]}
+    def get_timeout(self) -> Timeout:
+        return Timeout(self.config["timeout"])
 
 
 class JSONParser(ConfigFileParser):
