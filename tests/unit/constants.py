@@ -1,6 +1,39 @@
-COORDS = {"lon": 10.99, "lat": 44.34}
+from datetime import datetime, timezone
+
+from freezegun import freeze_time
+
+from src.structures import Coords, GeoConfig, GeoData, WeatherConfig, WeatherData
+
+freezer = freeze_time("2023-01-01 00:00:00.000000+00:00")
+GEO_CONFIG = GeoConfig("London", "provider", "api_key")
+GEO_DATA = GeoData("London", "", "GB")
+COORDS = Coords(51.5085, -0.1257)
+OW_WEATHER_CONFIG = WeatherConfig("openweather", "api_key")
+OM_WEATHER_CONFIG = WeatherConfig("openmeteo", "")
+
+freezer.start()
+OW_WEATHER_DATA = WeatherData(
+    datetime.now(timezone.utc),
+    "openweather",
+    298.48,  # hella hot
+    64,
+    "N",
+    349,
+    0.62,
+)
+OM_WEATHER_DATA = WeatherData(
+    datetime.now(timezone.utc),
+    "openmeteo",
+    2.4,
+    86,
+    "E",
+    95,
+    11.9,
+)
+freezer.stop()
+
 OW_RESPONSE = {
-    "coord": COORDS,
+    "coord": {"lon": 10.99, "lat": 44.34},
     "weather": [
         {
             "id": 501,
