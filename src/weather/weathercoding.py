@@ -105,6 +105,8 @@ class DBWeatherProvider(WeatherProvider):
                 (self.city,),
             )
             row = cursor.fetchall()
+            if len(row) == 0:
+                raise ProviderNoDataError("No data found in cache")
             data = row[-1]
             weather_data = WeatherData(
                 data[0], data[1], data[2], data[3], data[4], data[5], data[6]
