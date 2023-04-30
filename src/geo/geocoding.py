@@ -16,7 +16,7 @@ class GeoProvider:
 
     def get_city_data(self) -> GeoData:
         return GeoData(
-            self.config["name"], self.config["state"], self.config["country"]
+            self.config["name"], self.config.get("state", ""), self.config["country"]
         )
 
 

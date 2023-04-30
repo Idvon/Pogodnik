@@ -27,10 +27,11 @@ with requests_mock.Mocker() as m:
 
 
 def test_geocoding_parser():
-    provider = OpenWeatherGeoProvider(GEO_CONFIG)
     with requests_mock.Mocker() as m:
         m.get(OW_GEO_URL, json=GEOCODING_RESPONSE)
-        assert provider.get_city_data() == GEO_DATA
+        provider = OpenWeatherGeoProvider(GEO_CONFIG)
+        geo_data = provider.get_city_data()
+        assert geo_data == GEO_DATA
     assert provider.get_coords() == COORDS
 
 
