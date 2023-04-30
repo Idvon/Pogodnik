@@ -1,49 +1,52 @@
 from freezegun import freeze_time
-from pytest import fixture
 
 from src.weather.weathercoding import (
     OpenMeteoWeatherProvider,
     OpenWeatherWeatherProvider,
     create_net_weather_provider,
 )
-from tests.conftest import MockResponse
 from tests.unit.constants import (
     COORDS,
     OM_RESPONSE,
     OM_WEATHER_CONFIG,
     OM_WEATHER_DATA,
+    OM_URL,
     OW_RESPONSE,
     OW_WEATHER_CONFIG,
     OW_WEATHER_DATA,
+    OW_URL,
 )
-
-GET_PATH = "src.weather.weathercoding.get"
-
-
-@fixture
-def mock_openmeteo_get(mocker):
-    mocker.patch(GET_PATH, lambda *args, **kwargs: MockResponse(OM_RESPONSE, 200))
+import requests
+import requests_mock
 
 
-@fixture
-def mock_openweather_get(mocker):
-    mocker.patch(GET_PATH, lambda *args, **kwargs: MockResponse(OW_RESPONSE, 200))
+with requests_mock.Mocker() as m:
+    m.get(OW_URL, json=OW_RESPONSE)
+    requests.get(OW_URL).json()
+
+with requests_mock.Mocker() as m:
+    m.get(OM_URL, json=OM_RESPONSE)
+    requests.get(OM_URL).json()
 
 
 @freeze_time("2023-01-01 00:00:00.000000+00:00")
-def test_openweather_parsing(mock_openweather_get):
+def test_openweather_parsing():
     provider = OpenWeatherWeatherProvider(OW_WEATHER_CONFIG, COORDS)
     assert isinstance(provider, OpenWeatherWeatherProvider)
-    data = provider.weather_data(provider.request())
-    assert data == OW_WEATHER_DATA
+    with requests_mock.Mocker() as m:
+        m.get(OW_URL, json=OW_RESPONSE)
+        data = provider.weather_data(provider.request())
+        assert data == OW_WEATHER_DATA
 
 
 @freeze_time("2023-01-01 00:00:00.000000+00:00")
-def test_openmeteo_parsing(mock_openmeteo_get):
+def test_openmeteo_parsing():
     provider = OpenMeteoWeatherProvider(OM_WEATHER_CONFIG, COORDS)
     assert isinstance(provider, OpenMeteoWeatherProvider)
-    data = provider.weather_data(provider.request())
-    assert data == OM_WEATHER_DATA
+    with requests_mock.Mocker() as m:
+        m.get(OM_URL, json=OM_RESPONSE)
+        data = provider.weather_data(provider.request())
+        assert data == OM_WEATHER_DATA
 
 
 def test_net_provider_creation():
