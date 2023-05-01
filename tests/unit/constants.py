@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from pathlib import Path
 
 from freezegun import freeze_time
 
@@ -15,6 +16,9 @@ OW_GEO_URL = "https://api.openweathermap.org/geo/1.0/direct"
 OM_WEATHER_CONFIG = WeatherConfig("openmeteo", "")
 OM_URL = "https://api.open-meteo.com/v1/forecast"
 
+CACHE_FILE = Path("file.sqlite3")
+CACHE_CITY = "London"
+CACHE_TIMEOUT = 0
 
 FREEZER.start()
 OW_WEATHER_DATA = WeatherData(

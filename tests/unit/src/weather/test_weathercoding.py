@@ -3,7 +3,9 @@ from freezegun import freeze_time
 from src.weather.weathercoding import (
     OpenMeteoWeatherProvider,
     OpenWeatherWeatherProvider,
+    DBWeatherProvider,
     create_net_weather_provider,
+    create_local_weather_provider,
 )
 from tests.unit.constants import (
     COORDS,
@@ -15,6 +17,9 @@ from tests.unit.constants import (
     OW_WEATHER_CONFIG,
     OW_WEATHER_DATA,
     OW_URL,
+    CACHE_CITY,
+    CACHE_FILE,
+    CACHE_TIMEOUT,
 )
 import requests
 import requests_mock
@@ -54,3 +59,8 @@ def test_net_provider_creation():
     assert isinstance(provider, OpenMeteoWeatherProvider)
     provider = create_net_weather_provider(OW_WEATHER_CONFIG, COORDS)
     assert isinstance(provider, OpenWeatherWeatherProvider)
+
+
+def test_local_provider_creation():
+    provider = create_local_weather_provider(CACHE_FILE, CACHE_CITY, CACHE_TIMEOUT)
+    assert isinstance(provider, DBWeatherProvider)
