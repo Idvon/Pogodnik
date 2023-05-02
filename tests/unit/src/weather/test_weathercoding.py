@@ -1,29 +1,29 @@
+import requests
+import requests_mock
 from freezegun import freeze_time
 
 from src.weather.weathercoding import (
+    DBWeatherProvider,
     OpenMeteoWeatherProvider,
     OpenWeatherWeatherProvider,
-    DBWeatherProvider,
-    create_net_weather_provider,
     create_local_weather_provider,
+    create_net_weather_provider,
 )
 from tests.unit.constants import (
     COORDS,
+    GEO_DATA,
+    LOCAL_CITY,
+    LOCAL_FILE,
+    LOCAL_TIMEOUT,
     OM_RESPONSE,
+    OM_URL,
     OM_WEATHER_CONFIG,
     OM_WEATHER_DATA,
-    OM_URL,
     OW_RESPONSE,
+    OW_URL,
     OW_WEATHER_CONFIG,
     OW_WEATHER_DATA,
-    OW_URL,
-    CACHE_CITY,
-    CACHE_FILE,
-    CACHE_TIMEOUT,
 )
-import requests
-import requests_mock
-
 
 with requests_mock.Mocker() as m:
     m.get(OW_URL, json=OW_RESPONSE)
@@ -40,8 +40,7 @@ def test_openweather_parsing():
     assert isinstance(provider, OpenWeatherWeatherProvider)
     with requests_mock.Mocker() as m:
         m.get(OW_URL, json=OW_RESPONSE)
-        data = provider.weather_data(provider.request())
-        assert data == OW_WEATHER_DATA
+        assert provider.weather_data(provider.request()) == OW_WEATHER_DATA
 
 
 @freeze_time("2023-01-01 00:00:00.000000+00:00")
@@ -50,8 +49,14 @@ def test_openmeteo_parsing():
     assert isinstance(provider, OpenMeteoWeatherProvider)
     with requests_mock.Mocker() as m:
         m.get(OM_URL, json=OM_RESPONSE)
-        data = provider.weather_data(provider.request())
-        assert data == OM_WEATHER_DATA
+        assert provider.weather_data(provider.request()) == OM_WEATHER_DATA
+
+
+@freeze_time("2023-01-01 00:00:00.000000+00:00")
+def test_local_provider_parsing():
+    provider = DBWeatherProvider(LOCAL_FILE, LOCAL_CITY, LOCAL_TIMEOUT)
+    assert isinstance(provider, DBWeatherProvider)
+    assert provider.weather_data(provider) == (OW_WEATHER_DATA, GEO_DATA)
 
 
 def test_net_provider_creation():
@@ -62,5 +67,5 @@ def test_net_provider_creation():
 
 
 def test_local_provider_creation():
-    provider = create_local_weather_provider(CACHE_FILE, CACHE_CITY, CACHE_TIMEOUT)
+    provider = create_local_weather_provider(LOCAL_FILE, LOCAL_CITY, LOCAL_TIMEOUT)
     assert isinstance(provider, DBWeatherProvider)

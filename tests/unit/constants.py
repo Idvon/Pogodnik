@@ -16,9 +16,9 @@ OW_GEO_URL = "https://api.openweathermap.org/geo/1.0/direct"
 OM_WEATHER_CONFIG = WeatherConfig("openmeteo", "")
 OM_URL = "https://api.open-meteo.com/v1/forecast"
 
-CACHE_FILE = Path("file.sqlite3")
-CACHE_CITY = "London"
-CACHE_TIMEOUT = 0
+LOCAL_FILE = Path("test_db.sqlite3")
+LOCAL_CITY = "London"
+LOCAL_TIMEOUT = 1
 
 FREEZER.start()
 OW_WEATHER_DATA = WeatherData(

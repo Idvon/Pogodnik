@@ -109,7 +109,13 @@ class DBWeatherProvider(WeatherProvider):
                 raise ProviderNoDataError("No data found in cache")
             data = row[-1]
             weather_data = WeatherData(
-                data[0], data[1], data[2], data[3], data[4], data[5], data[6]
+                datetime.fromisoformat(data[0]),
+                data[1],
+                data[2],
+                data[3],
+                data[4],
+                data[5],
+                data[6],
             )
             geo_data = GeoData(data[7], data[8], data[9])
             cursor.close()
@@ -118,7 +124,7 @@ class DBWeatherProvider(WeatherProvider):
         finally:
             sqlite_connection.close()
         current_time = datetime.now(timezone.utc)
-        last_time = datetime.fromisoformat(weather_data.datetime)
+        last_time = weather_data.datetime
         if (current_time - last_time) <= delta:
             return weather_data, geo_data
         raise ProviderNoDataError("No data found in cache")

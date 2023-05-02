@@ -1,3 +1,5 @@
+import requests
+import requests_mock
 from pytest import raises
 
 from src.exceptions import ProviderNoDataError
@@ -10,8 +12,6 @@ from tests.unit.constants import (
     GEOCODING_RESPONSE,
     OW_GEO_URL,
 )
-import requests
-import requests_mock
 
 with requests_mock.Mocker() as m:
     m.get(OW_GEO_URL, json=GEOCODING_RESPONSE)
@@ -30,8 +30,7 @@ def test_geocoding_parser():
     with requests_mock.Mocker() as m:
         m.get(OW_GEO_URL, json=GEOCODING_RESPONSE)
         provider = OpenWeatherGeoProvider(GEO_CONFIG)
-        geo_data = provider.get_city_data()
-        assert geo_data == GEO_DATA
+        assert provider.get_city_data() == GEO_DATA
     assert provider.get_coords() == COORDS
 
 
