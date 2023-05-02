@@ -19,6 +19,7 @@ pytest = "^7.2.2"
 coverage = "^7.2.2"
 pytest-mock = "^3.10.0"
 freezegun = "*"
+requests_mock = "*"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
