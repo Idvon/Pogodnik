@@ -17,7 +17,7 @@ OM_WEATHER_CONFIG = WeatherConfig("openmeteo", "")
 OM_URL = "https://api.open-meteo.com/v1/forecast"
 
 LOCAL_FILE = Path("db.sqlite3")
-LOCAL_CITY = "London"
+LOCAL_CITY = GEO_CONFIG.city_name
 LOCAL_TIMEOUT = 1
 
 FREEZER.start()
