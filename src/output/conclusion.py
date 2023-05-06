@@ -50,7 +50,7 @@ class DatabaseWriter(CityData):
                 city text,
                 state text,
                 country text)
-            """
+                """
             cursor = sqlite_connection.cursor()
             cursor.execute(headers)
             cursor.execute(
