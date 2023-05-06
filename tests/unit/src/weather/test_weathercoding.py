@@ -1,20 +1,17 @@
 import requests
 import requests_mock
 from freezegun import freeze_time
+from unittest.mock import patch
 
 from src.weather.weathercoding import (
     DBWeatherProvider,
     OpenMeteoWeatherProvider,
     OpenWeatherWeatherProvider,
-    create_local_weather_provider,
     create_net_weather_provider,
+    create_local_weather_provider,
 )
 from tests.unit.constants import (
     COORDS,
-    GEO_DATA,
-    LOCAL_CITY,
-    LOCAL_FILE,
-    LOCAL_TIMEOUT,
     OM_RESPONSE,
     OM_URL,
     OM_WEATHER_CONFIG,
@@ -23,7 +20,14 @@ from tests.unit.constants import (
     OW_URL,
     OW_WEATHER_CONFIG,
     OW_WEATHER_DATA,
+    GEO_DATA,
+    LOCAL_FILE,
+    LOCAL_CITY,
+    LOCAL_TIMEOUT,
 )
+
+SQLITE_PATH = "src.weather.weathercoding.sqlite3"
+
 
 with requests_mock.Mocker() as m:
     m.get(OW_URL, json=OW_RESPONSE)
@@ -52,13 +56,6 @@ def test_openmeteo_parsing():
         assert provider.weather_data(provider.request()) == OM_WEATHER_DATA
 
 
-@freeze_time("2023-01-01 00:00:00.000000+00:00")
-def test_local_provider_parsing():
-    provider = DBWeatherProvider(LOCAL_FILE, LOCAL_CITY, LOCAL_TIMEOUT)
-    assert isinstance(provider, DBWeatherProvider)
-    assert provider.weather_data(provider) == (OW_WEATHER_DATA, GEO_DATA)
-
-
 def test_net_provider_creation():
     provider = create_net_weather_provider(OM_WEATHER_CONFIG, COORDS)
     assert isinstance(provider, OpenMeteoWeatherProvider)
@@ -66,6 +63,12 @@ def test_net_provider_creation():
     assert isinstance(provider, OpenWeatherWeatherProvider)
 
 
-def test_local_provider_creation():
+@freeze_time("2023-01-01 00:00:00.000000+00:00")
+@patch(SQLITE_PATH)
+def test_local_provider_creation(mocked_connect):
+    mc = mocked_connect.connect().cursor().fetchall
+    mc.return_value = [('2023-01-01 00:00:00.000000+00:00', 'openweather', 298.48, 64, 'N', 349, 0.62,
+                        'London', '', 'GB')]
     provider = create_local_weather_provider(LOCAL_FILE, LOCAL_CITY, LOCAL_TIMEOUT)
-    assert isinstance(provider, DBWeatherProvider)
+    data = provider.weather_data()
+    assert data == (OW_WEATHER_DATA, GEO_DATA)
