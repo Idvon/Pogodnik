@@ -1,4 +1,4 @@
-FROM python:3.10-alpine
+FROM python:3.10.11-alpine
 RUN mkdir /app 
 COPY pyproject.toml /app 
 WORKDIR /app
