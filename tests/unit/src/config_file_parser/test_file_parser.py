@@ -2,14 +2,9 @@ from pathlib import Path
 
 from pytest import raises
 
-from src.config_file_parser.file_parser import (
-    GeoConfig,
-    JSONParser,
-    TOMLParser,
-    WeatherConfig,
-    create_parser,
-)
+from src.config_file_parser.file_parser import JSONParser, TOMLParser, create_parser
 from src.exceptions import ProviderCreationError
+from src.structures import GeoConfig, WeatherConfig
 
 json_parser = create_parser(Path("example_config.json"))
 toml_parser = create_parser(Path("example_config.toml"))
