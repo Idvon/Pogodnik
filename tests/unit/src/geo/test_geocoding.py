@@ -13,34 +13,29 @@ from tests.unit.constants import (
     OW_GEO_URL,
 )
 
-with requests_mock.Mocker() as m:
-    m.get(OW_GEO_URL, json=GEOCODING_RESPONSE)
-    requests.get(OW_GEO_URL).json()
-
-with requests_mock.Mocker() as m:
-    m.get(OW_GEO_URL, json=GEOCODING_ERROR_RESPONSE)
-    requests.get(OW_GEO_URL).json()
-
-with requests_mock.Mocker() as m:
-    m.get(OW_GEO_URL, json=[])
-    requests.get(OW_GEO_URL).json()
-
 
 def test_geocoding_parser():
     with requests_mock.Mocker() as m:
         m.get(OW_GEO_URL, json=GEOCODING_RESPONSE)
+        requests.get(OW_GEO_URL).json()
         provider = OpenWeatherGeoProvider(GEO_CONFIG)
         assert provider.get_city_data() == GEO_DATA
     assert provider.get_coords() == COORDS
 
 
 def test_geocoding_city_not_found():
-    provider = OpenWeatherGeoProvider(GEO_CONFIG)
+    with requests_mock.Mocker() as m:
+        m.get(OW_GEO_URL, json=GEOCODING_ERROR_RESPONSE)
+        requests.get(OW_GEO_URL).json()
+        provider = OpenWeatherGeoProvider(GEO_CONFIG)
     with raises(ProviderNoDataError):
         provider.get_coords()
 
 
 def test_geocoding_api_error():
-    provider = OpenWeatherGeoProvider(GEO_CONFIG)
+    with requests_mock.Mocker() as m:
+        m.get(OW_GEO_URL, json=[])
+        requests.get(OW_GEO_URL).json()
+        provider = OpenWeatherGeoProvider(GEO_CONFIG)
     with raises(ProviderNoDataError):
         provider.get_coords()
