@@ -1,4 +1,4 @@
-import argparse
+from argparse import ArgumentParser
 from pathlib import Path
 
 from src.config_file_parser.file_parser import create_parser
@@ -9,10 +9,11 @@ from src.weather.weathercoding import (
     create_local_weather_provider,
     create_net_weather_provider,
 )
+from src.output.app import APP, add_data
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Weather by config file")
+    parser = ArgumentParser(description="Weather by config file")
     parser.add_argument("--config", type=str)
     parser.add_argument("--output", type=str)
     args = parser.parse_args()
@@ -45,10 +46,10 @@ def main():
 
     create_output_format(weather_data, geo_data, file_out).city_outputs()
     create_output_format(weather_data, geo_data, file_db).city_outputs()
-    return to_display(
-        weather_data,
-        geo_data,
-    )
+    city_weather_data = to_display(weather_data, geo_data)
+    add_data(city_weather_data)
+    APP.run()
+    print(city_weather_data)
 
 
 if __name__ == "__main__":
