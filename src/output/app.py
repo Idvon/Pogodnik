@@ -4,7 +4,7 @@ APP = Flask(__name__)
 DATA: str
 
 
-def add_data(data: str):
+def to_app(data: str):
     global DATA
     DATA = data
     return DATA
@@ -12,4 +12,4 @@ def add_data(data: str):
 
 @APP.route("/")
 def web_conclusion() -> str:
-    return render_template('index.html', data=add_data(DATA))
+    return render_template("index.html", data=to_app(DATA))

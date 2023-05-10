@@ -4,12 +4,12 @@ from pathlib import Path
 from src.config_file_parser.file_parser import create_parser
 from src.exceptions import ProviderNoDataError
 from src.geo.geocoding import create_geo_provider
+from src.output.app import APP, to_app
 from src.output.conclusion import create_output_format, to_display
 from src.weather.weathercoding import (
     create_local_weather_provider,
     create_net_weather_provider,
 )
-from src.output.app import APP, add_data
 
 
 def main():
@@ -47,7 +47,7 @@ def main():
     create_output_format(weather_data, geo_data, file_out).city_outputs()
     create_output_format(weather_data, geo_data, file_db).city_outputs()
     city_weather_data = to_display(weather_data, geo_data)
-    add_data(city_weather_data)
+    to_app(city_weather_data)
     APP.run()
     print(city_weather_data)
 
