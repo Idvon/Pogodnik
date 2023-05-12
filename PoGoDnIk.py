@@ -10,16 +10,30 @@ from src.weather.weathercoding import (
     create_net_weather_provider,
 )
 
+FILE_CONFIG: Path
+FILE_OUTPUT: Path
+
 
 def parser_terminal():
     parser = argparse.ArgumentParser(description="Weather by config file")
     parser.add_argument("--config", type=str)
     parser.add_argument("--output", type=str)
     args = parser.parse_args()
-    return Path(args.config), Path(args.output)
+    global FILE_CONFIG, FILE_OUTPUT
+    FILE_CONFIG = Path(args.config)
+    FILE_OUTPUT = Path(args.output)
 
 
-def main(file_config: Path, file_output: Path):
+def parser_files(file_config: Path, file_output: Path):
+    global FILE_CONFIG, FILE_OUTPUT
+    FILE_CONFIG = file_config
+    FILE_OUTPUT = file_output
+    return main()
+
+
+def main():
+    file_config = FILE_CONFIG
+    file_output = FILE_OUTPUT
     file_db = Path("db.sqlite3")
     if not file_config.is_file():
         raise FileNotFoundError("Config file not found")
@@ -51,5 +65,5 @@ def main(file_config: Path, file_output: Path):
 
 
 if __name__ == "__main__":
-    file_config, file_output = parser_terminal()
-    print(main(file_config, file_output))
+    parser_terminal()
+    print(main())
