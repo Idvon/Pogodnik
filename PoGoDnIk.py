@@ -1,4 +1,3 @@
-import argparse
 from pathlib import Path
 
 from src.config_file_parser.file_parser import create_parser
@@ -11,13 +10,7 @@ from src.weather.weathercoding import (
 )
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Weather by config file")
-    parser.add_argument("--config", type=str)
-    parser.add_argument("--output", type=str)
-    args = parser.parse_args()
-    file_config = Path(args.config)
-    file_out = Path(args.output)
+def main(file_config: Path, file_output: Path):
     file_db = Path("db.sqlite3")
     if not file_config.is_file():
         raise FileNotFoundError("Config file not found")
@@ -43,13 +36,8 @@ def main():
     net_weather_provider = create_net_weather_provider(weather_config, coords)
     weather_data = net_weather_provider.weather_data(net_weather_provider.request())
 
-    create_output_format(weather_data, geo_data, file_out).city_outputs()
+    create_output_format(weather_data, geo_data, file_output).city_outputs()
     create_output_format(weather_data, geo_data, file_db).city_outputs()
-    return to_display(
-        weather_data,
-        geo_data,
-    )
-
-
-if __name__ == "__main__":
-    main()
+    city_weather_data = to_display(weather_data, geo_data)
+    print(city_weather_data)
+    return city_weather_data

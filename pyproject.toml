@@ -8,6 +8,7 @@ authors = ["Idvon <d.suchanow2010@yandex.ru>"]
 python = "^3.10"
 toml = "0.10.2"
 requests = "2.29.0"
+flask = "2.3.2"
 
 [tool.poetry.dev-dependencies]
 mypy = "1.2.0"

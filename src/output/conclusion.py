@@ -77,8 +77,8 @@ def create_output_format(
     raise ProviderCreationError("No local provider available")
 
 
-def to_display(weather_data: WeatherData, geo_data: GeoData) -> None:
-    print(
+def to_display(weather_data: WeatherData, geo_data: GeoData) -> str:
+    return (
         f"Weather in {geo_data.city}\n"
         f"Country: {geo_data.country}\n"
         f"State: {geo_data.state}\n"
