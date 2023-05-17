@@ -15,7 +15,7 @@ FILE_OUTPUT: Path
 
 
 def parser_terminal():
-    parser = argparse.ArgumentParser(description="Weather by config file")
+    parser = argparse.ArgumentParser(description="Weather by config file")              # to run directly
     parser.add_argument("--config", type=str)
     parser.add_argument("--output", type=str)
     args = parser.parse_args()
@@ -24,7 +24,7 @@ def parser_terminal():
     FILE_OUTPUT = Path(args.output)
 
 
-def parser_files(file_config: Path, file_output: Path):
+def parser_files(file_config: Path, file_output: Path):                                 # to run as a module
     global FILE_CONFIG, FILE_OUTPUT
     FILE_CONFIG = file_config
     FILE_OUTPUT = file_output
@@ -41,7 +41,7 @@ def main():
     geo_config = config_parser.get_geo_config()
     weather_config = config_parser.get_weather_config()
 
-    if file_db.is_file():
+    if file_db.is_file():                                                               # cache initialization
         timeout = config_parser.get_timeout()
         local_weather_provider = create_local_weather_provider(
             file_db, geo_config.city_name, timeout
@@ -52,16 +52,16 @@ def main():
         except ProviderNoDataError:
             pass
 
-    geo_provider = create_geo_provider(geo_config)
+    geo_provider = create_geo_provider(geo_config)                                      # geo data initialization
     coords = geo_provider.get_coords()
     geo_data = geo_provider.get_city_data()
 
-    net_weather_provider = create_net_weather_provider(weather_config, coords)
-    weather_data = net_weather_provider.weather_data(net_weather_provider.request())
+    net_weather_provider = create_net_weather_provider(weather_config, coords)          # initializing the weather data
+    weather_data = net_weather_provider.weather_data(net_weather_provider.request())    # of the net provider
 
-    create_output_format(weather_data, geo_data, file_output).city_outputs()
-    create_output_format(weather_data, geo_data, file_db).city_outputs()
-    return to_display(weather_data, geo_data)
+    create_output_format(weather_data, geo_data, file_output).city_outputs()            # initialize output to a file
+    create_output_format(weather_data, geo_data, file_db).city_outputs()                # initialize output to a db
+    return to_display(weather_data, geo_data)                                           # initialize output to str form
 
 
 if __name__ == "__main__":

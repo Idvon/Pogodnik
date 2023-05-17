@@ -12,5 +12,5 @@ APP = Flask(__name__)
 def web_conclusion():
     file_config = Path(getenv("FILE_CONFIG"))
     file_output = Path(getenv("FILE_OUTPUT"))
-    city_data = parser_files(file_config, file_output)
-    return render_template("index.html", data=city_data)
+    city_config = parser_files(file_config, file_output)    # sending work files
+    return render_template("index.html", data=city_config)

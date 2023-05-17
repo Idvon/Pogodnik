@@ -1,27 +1,35 @@
-<html>
-<head>
-    <title>FlaskApp</title>
-    <style>
-        .head{
-        font-family: "Impact", sans-serif;
-        color: white;
-        }
-        .text{
-        font-family: "Comic Sans", sans-serif;
-        color: white;
-        }
-    </style>
-</head>
-<body bgcolor="black">
-    <h1 class="head">Welcome to PoGoDnIk!</h1>
-    <p class="text">
-    {% set data = data.split('\n') %}
-    {% for item in data %}
-    {{ item }}
-        {% if not loop.last %}
-         <br/>
-        {% endif %}
-    {% endfor %}
-    </p>
-</body>
+<html lang="en">
+    <head>
+        <title>FlaskApp</title>
+        <style>
+            .head{
+            font-family: "Impact", sans-serif;
+            color: white;
+            }
+            .text{
+            font-family: "Comic Sans", sans-serif;
+            color: white;
+            }
+        </style>
+    </head>
+    <body bgcolor="black">
+        <h1 class="head">Welcome to PoGoDnIk!</h1>
+        <h2 class="head">Enter the city name:</h2>
+        <form action="" method="post">
+            <p>
+                <input type="text" id="city_name">
+                <label for="city_name">City name</label>
+                <input type="submit"/>
+            </p>
+        </form>
+        <p class="text">
+            {% set data = data.split('\n') %}
+            {% for item in data %}
+            {{ item }}
+                {% if not loop.last %}
+                 <br/>
+                {% endif %}
+            {% endfor %}
+        </p>
+    </body>
 </html>>
