@@ -74,8 +74,8 @@ def test_db_weather_provider(mocked_connect):
             349,
             0.62,
             "London",
-            "",
             "GB",
+            "",
         )
     ]
     provider = DBWeatherProvider(LOCAL_FILE, LOCAL_CITY, LOCAL_TIMEOUT)

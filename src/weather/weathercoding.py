@@ -98,8 +98,8 @@ class DBWeatherProvider(WeatherProvider):
                 winddeg,
                 windspeed,
                 city,
-                state,
-                country
+                country,
+                state
                 FROM weather_results WHERE city = ?
                 """,
                 (self.city,),

@@ -15,8 +15,8 @@ class WeatherConfig(NamedTuple):
 
 class GeoData(NamedTuple):
     city: str
-    state: str
     country: str
+    state: str | None
 
 
 class Coords(NamedTuple):

@@ -16,7 +16,7 @@ class GeoProvider:
 
     def get_city_data(self) -> GeoData:
         return GeoData(
-            self.config["name"], self.config.get("state", ""), self.config["country"]
+            self.config["name"], self.config["country"], self.config.get("state", "")
         )
 
 
@@ -25,6 +25,8 @@ class OpenWeatherGeoProvider(GeoProvider):
         payload = {"q": geo_config.city_name, "appid": geo_config.api_key}
         url = "https://api.openweathermap.org/geo/1.0/direct"
         data = get(url, params=payload).json()
+        for city in data:
+            print(f"name: {city['name']}, country: {city['country']}, state: {city['state']}\n")
         if isinstance(data, list):
             self.config = dict() if len(data) == 0 else data[0]
         else:
