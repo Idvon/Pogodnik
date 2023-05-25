@@ -5,6 +5,7 @@ from typing import NamedTuple
 class GeoConfig(NamedTuple):
     city_name: str
     provider: str
+    limit: int
     api_key: str
 
 

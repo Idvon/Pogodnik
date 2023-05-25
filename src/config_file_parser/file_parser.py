@@ -15,6 +15,7 @@ class ConfigFileParser:
         return GeoConfig(
             self.config["city_name"],
             self.config["geo_provider"]["name"],
+            self.config["geo_provider"]["limit"],
             self.config["geo_provider"]["api_key"],
         )
 

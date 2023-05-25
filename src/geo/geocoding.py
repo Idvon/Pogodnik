@@ -22,15 +22,13 @@ class GeoProvider:
 
 class OpenWeatherGeoProvider(GeoProvider):
     def __init__(self, geo_config: GeoConfig):
-        payload = {"q": geo_config.city_name, "appid": geo_config.api_key}
+        payload = {"q": geo_config.city_name, "limit": geo_config.limit, "appid": geo_config.api_key}
         url = "https://api.openweathermap.org/geo/1.0/direct"
         data = get(url, params=payload).json()
         for city in data:
-            print(f"name: {city['name']}, country: {city['country']}, state: {city['state']}\n")
-        if isinstance(data, list):
-            self.config = dict() if len(data) == 0 else data[0]
-        else:
-            self.config = data
+            print(f"{data.index(city) + 1}. name: {city['name']}, country: {city['country']}, state: {city['state']}")
+        num_city = int(input("Please write number your city: "))
+        self.config = data[num_city - 1]
 
 
 PROVIDERS = {"openweather": OpenWeatherGeoProvider}
