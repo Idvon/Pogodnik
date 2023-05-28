@@ -2,10 +2,14 @@ from os import getenv
 from pathlib import Path
 
 from flask import Flask, render_template
-
+from wtforms import Form, StringField, validators
 from PoGoDnIk import parser_files
 
 APP = Flask(__name__)
+
+
+class MyForm(Form):
+    first = StringField('City Name', [validators.Length(min=3, max=30)])
 
 
 @APP.route("/")
