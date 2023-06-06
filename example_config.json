@@ -7,6 +7,7 @@
 },
 "geo_provider": {
   "name": "openweather",
+  "limit": 5,
   "api_key": "geo api key"
 }
 }

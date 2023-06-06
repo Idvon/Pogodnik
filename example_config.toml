@@ -5,4 +5,5 @@ name = "openweather"
 api_key = "weather api key"
 [geo_provider]
 name = "openweather"
+limit = 5
 api_key = "geo api key"
