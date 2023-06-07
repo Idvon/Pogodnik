@@ -3,15 +3,22 @@ from pathlib import Path
 
 from src.config_file_parser.file_parser import create_parser
 from src.exceptions import ProviderNoDataError
-from src.geo.geocoding import create_geo_provider
+from src.geo.geocoding import create_geo_provider, GeoProvider
 from src.output.conclusion import create_output_format, to_display
 from src.weather.weathercoding import (
     create_local_weather_provider,
     create_net_weather_provider,
 )
+from src.structures import GeoConfig, Coords, GeoData, WeatherConfig
 
 FILE_CONFIG: Path
 FILE_OUTPUT: Path
+WEATHER_CONFIG: WeatherConfig
+GEO_DATA: GeoData
+GEO_CONFIG: GeoConfig
+GEO_PROVIDER: GeoProvider
+COORDS: Coords
+TIMEOUT: int
 
 
 def parser_terminal():
@@ -31,20 +38,40 @@ def parser_files(file_config: Path, file_output: Path):                         
     return main()
 
 
-def main():
-    file_config = FILE_CONFIG
-    file_output = FILE_OUTPUT
-    file_db = Path("db.sqlite3")
-    if not file_config.is_file():
+def get_config():
+    if not FILE_CONFIG.is_file():
         raise FileNotFoundError("Config file not found")
-    config_parser = create_parser(file_config)
-    geo_config = config_parser.get_geo_config()
-    weather_config = config_parser.get_weather_config()
+    config_parser = create_parser(FILE_CONFIG)
+    global GEO_CONFIG, WEATHER_CONFIG, TIMEOUT
+    GEO_CONFIG = config_parser.get_geo_config()
+    WEATHER_CONFIG = config_parser.get_weather_config()
+    TIMEOUT = config_parser.get_timeout()
 
+
+# getting a list of cities
+def get_city_list() -> dict:
+    city_data: dict = dict()
+    global GEO_PROVIDER, GEO_CONFIG
+    GEO_PROVIDER = create_geo_provider(GEO_CONFIG)
+    list_city = GEO_PROVIDER.list_city
+    for city in list_city:
+        city_data[list_city.index(city) + 1] = \
+            f"name: {city['name']}, country: {city['country']}, state: {city['state']}"
+    return city_data
+
+
+def get_city_geo_data(number: int):
+    global GEO_PROVIDER, COORDS, GEO_DATA
+    GEO_PROVIDER.config = GEO_PROVIDER.list_city[number]
+    COORDS = GEO_PROVIDER.get_coords()
+    GEO_DATA = GEO_PROVIDER.get_city_data()
+
+
+def main():
+    file_db = Path("db.sqlite3")
     if file_db.is_file():                                                               # cache initialization
-        timeout = config_parser.get_timeout()
         local_weather_provider = create_local_weather_provider(
-            file_db, geo_config.city_name, timeout
+            file_db, GEO_CONFIG.city_name, TIMEOUT
         )
         try:
             weather_cache, geo_cache = local_weather_provider.weather_data()
@@ -52,18 +79,19 @@ def main():
         except ProviderNoDataError:
             pass
 
-    geo_provider = create_geo_provider(geo_config)                                      # geo data initialization
-    coords = geo_provider.get_coords()
-    geo_data = geo_provider.get_city_data()
-
-    net_weather_provider = create_net_weather_provider(weather_config, coords)          # initializing the weather data
+    net_weather_provider = create_net_weather_provider(WEATHER_CONFIG, COORDS)          # initializing the weather data
     weather_data = net_weather_provider.weather_data(net_weather_provider.request())    # of the net provider
 
-    create_output_format(weather_data, geo_data, file_output).city_outputs()            # initialize output to a file
-    create_output_format(weather_data, geo_data, file_db).city_outputs()                # initialize output to a db
-    return to_display(weather_data, geo_data)                                           # initialize output to str form
+    create_output_format(weather_data, GEO_DATA, FILE_OUTPUT).city_outputs()            # initialize output to a file
+    create_output_format(weather_data, GEO_DATA, file_db).city_outputs()                # initialize output to a db
+    return to_display(weather_data, GEO_DATA)                                           # initialize output to str form
 
 
 if __name__ == "__main__":
     parser_terminal()
+    get_config()
+    data = get_city_list()
+    print("\n".join([f"{elem}. {data[elem]}" for elem in data]))
+    num = int(input("Please write number your city: "))
+    get_city_geo_data(num - 1)
     print(main())
