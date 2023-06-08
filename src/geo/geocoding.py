@@ -19,7 +19,11 @@ class GeoProvider:
 
 class OpenWeatherGeoProvider(GeoProvider):
     def __init__(self, geo_config: GeoConfig):
-        payload = {"q": geo_config.city_name, "limit": geo_config.limit, "appid": geo_config.api_key}
+        payload = {
+            "q": geo_config.city_name,
+            "limit": geo_config.limit,
+            "appid": geo_config.api_key,
+        }
         url = "https://api.openweathermap.org/geo/1.0/direct"
         self.list_city = get(url, params=payload).json()
         if len(self.list_city) == 0:
