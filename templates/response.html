@@ -12,17 +12,11 @@
         <form method=post>
             <p class=text>
                 {% for key, val in city_list.items() %}
-                {{ key }}. {{ val }}
+                <a href="{{ url_for('data', num=key) }}">{{ key }}. {{ val }}</a>
                     {% if not loop.last %}
                      <br/>
                     {% endif %}
                 {% endfor %}
-            </p>
-            <dl>
-                {{  num_city.num_city  }}
-            </dl>
-            <p>
-                <input type=submit value="etot gorod"/>
             </p>
         </form>
     </body>

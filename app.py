@@ -35,17 +35,12 @@ def web_conclusion():
 
 @APP.route("/response", methods=["GET", "POST"])
 def response():
-    form = MyForm(request.form)
     get_config()
     city_list = get_city_list()
-    if request.method == "POST":
-        num_city = request.form.get("num_city")
-        num_city = int(num_city) - 1 if isinstance(num_city, str) is True else 0
-        get_city_geo_data(num_city)
-        return redirect(url_for("data"))
-    return render_template("response.html", num_city=form, city_list=city_list)
+    return render_template("response.html", city_list=city_list)
 
 
-@APP.route("/data")
-def data():
+@APP.route("/data/<int:num>")
+def data(num):
+    get_city_geo_data(num - 1)
     return render_template("data.html", data=main())
