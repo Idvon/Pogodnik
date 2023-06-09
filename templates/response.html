@@ -1,0 +1,29 @@
+<html lang=en>
+    <head>
+        <title>FlaskApp</title>
+        <style>
+            .text{
+            font-family: "Comic Sans", sans-serif;
+            color: white;
+            }
+        </style>
+    </head>
+    <body bgcolor=black>
+        <form method=post>
+            <p class=text>
+                {% for key, val in city_list.items() %}
+                {{ key }}. {{ val }}
+                    {% if not loop.last %}
+                     <br/>
+                    {% endif %}
+                {% endfor %}
+            </p>
+            <dl>
+                {{  num_city.num_city  }}
+            </dl>
+            <p>
+                <input type=submit value="etot gorod"/>
+            </p>
+        </form>
+    </body>
+</html>>
