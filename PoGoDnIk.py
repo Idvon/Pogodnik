@@ -11,69 +11,60 @@ from src.weather.weathercoding import (
     create_net_weather_provider,
 )
 
-FILE_CONFIG: Path
-FILE_OUTPUT: Path
-WEATHER_CONFIG: WeatherConfig
-GEO_DATA: GeoData
-GEO_CONFIG: GeoConfig
-GEO_PROVIDER: GeoProvider
-COORDS: Coords
-TIMEOUT: int
 
-
+# to run directly
 def parser_terminal():
-    parser = argparse.ArgumentParser(
-        description="Weather by config file"
-    )  # to run directly
+    parser = argparse.ArgumentParser(description="Weather by config file")
     parser.add_argument("--config", type=str)
     parser.add_argument("--output", type=str)
     args = parser.parse_args()
-    global FILE_CONFIG, FILE_OUTPUT
-    FILE_CONFIG = Path(args.config)
-    FILE_OUTPUT = Path(args.output)
+    config = Path(args.config)
+    output = Path(args.output)
+    return config, output
 
 
-def parser_files(file_config: Path, file_output: Path):  # to run as a module
-    global FILE_CONFIG, FILE_OUTPUT
-    FILE_CONFIG = file_config
-    FILE_OUTPUT = file_output
-
-
-def get_config():
-    if not FILE_CONFIG.is_file():
+def get_config(config: Path):
+    if not config.is_file():
         raise FileNotFoundError("Config file not found")
-    config_parser = create_parser(FILE_CONFIG)
-    global GEO_CONFIG, WEATHER_CONFIG, TIMEOUT
-    GEO_CONFIG = config_parser.get_geo_config()
-    WEATHER_CONFIG = config_parser.get_weather_config()
-    TIMEOUT = config_parser.get_timeout()
+    config_parser = create_parser(config)
+    get_geo_config = config_parser.get_geo_config()
+    get_weather_config = config_parser.get_weather_config()
+    get_timeout = config_parser.get_timeout()
+    return get_geo_config, get_weather_config, get_timeout
 
 
 # getting a list of cities
-def get_city_list() -> dict:
-    city_data: dict = dict()
-    global GEO_PROVIDER, GEO_CONFIG
-    GEO_PROVIDER = create_geo_provider(GEO_CONFIG)
-    list_city = GEO_PROVIDER.list_city
+def get_city_list(config: GeoConfig):
+    provider = create_geo_provider(config)
+    list_city = provider.list_city
+    town_list = dict()
     for city in list_city:
-        city_data[
+        town_list[
             list_city.index(city) + 1
         ] = f"name: {city['name']}, country: {city['country']}, state: {city['state']}"
-    return city_data
+    return provider, town_list
 
 
-def get_city_geo_data(number: int):
-    global GEO_PROVIDER, COORDS, GEO_DATA
-    GEO_PROVIDER.config = GEO_PROVIDER.list_city[number]
-    COORDS = GEO_PROVIDER.get_coords()
-    GEO_DATA = GEO_PROVIDER.get_city_data()
+def get_city_geo_data(provider: GeoProvider, number: int):
+    provider.config = provider.list_city[number]
+    get_coords = provider.get_coords()
+    get_city_data = provider.get_city_data()
+    return get_coords, get_city_data
 
 
-def main():
+def main(
+    config_geo: GeoConfig,
+    config_weather: WeatherConfig,
+    crd: Coords,
+    data_geo: GeoData,
+    output_file: Path,
+    time_out: int,
+):
+    # cache initialization
     file_db = Path("db.sqlite3")
-    if file_db.is_file():  # cache initialization
+    if file_db.is_file():
         local_weather_provider = create_local_weather_provider(
-            file_db, GEO_CONFIG.city_name, TIMEOUT
+            file_db, config_geo.city_name, time_out
         )
         try:
             weather_cache, geo_cache = local_weather_provider.weather_data()
@@ -82,26 +73,26 @@ def main():
             pass
 
     net_weather_provider = create_net_weather_provider(
-        WEATHER_CONFIG, COORDS
+        config_weather, crd
     )  # initializing the weather data
     weather_data = net_weather_provider.weather_data(
         net_weather_provider.request()
     )  # of the net provider
 
     create_output_format(
-        weather_data, GEO_DATA, FILE_OUTPUT
+        weather_data, data_geo, output_file
     ).city_outputs()  # initialize output to a file
     create_output_format(
-        weather_data, GEO_DATA, file_db
+        weather_data, data_geo, file_db
     ).city_outputs()  # initialize output to a db
-    return to_display(weather_data, GEO_DATA)  # initialize output to str form
+    return to_display(weather_data, data_geo)  # initialize output to str form
 
 
 if __name__ == "__main__":
-    parser_terminal()
-    get_config()
-    city_list = get_city_list()
+    file_config, file_output = parser_terminal()
+    geo_config, weather_config, timeout = get_config(file_config)
+    geo_provider, city_list = get_city_list(geo_config)
     print("\n".join([f"{elem}. {city_list[elem]}" for elem in city_list]))
     num = int(input("Please write number your city: "))
-    get_city_geo_data(num - 1)
-    print(main())
+    coords, city_geo_data = get_city_geo_data(geo_provider, num - 1)
+    print(main(geo_config, weather_config, coords, city_geo_data, file_output, timeout))
