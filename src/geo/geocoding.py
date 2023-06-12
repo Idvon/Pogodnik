@@ -1,3 +1,5 @@
+from typing import Dict, Union
+
 from requests import get
 
 from src.exceptions import ProviderCreationError, ProviderNoDataError
@@ -19,7 +21,7 @@ class GeoProvider:
 
 class OpenWeatherGeoProvider(GeoProvider):
     def __init__(self, geo_config: GeoConfig):
-        payload = {
+        payload: Dict[str, Union[int, str]] = {
             "q": geo_config.city_name,
             "limit": geo_config.limit,
             "appid": geo_config.api_key,

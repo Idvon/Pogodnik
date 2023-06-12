@@ -72,19 +72,19 @@ def main(
         except ProviderNoDataError:
             pass
 
-    net_weather_provider = create_net_weather_provider(
+    net_weather_provider = create_net_weather_provider(  # initializing the weather data
         config_weather, crd
-    )  # initializing the weather data
-    weather_data = net_weather_provider.weather_data(
+    )
+    weather_data = net_weather_provider.weather_data(  # of the net provider
         net_weather_provider.request()
-    )  # of the net provider
+    )
 
-    create_output_format(
+    create_output_format(  # initialize output to a file
         weather_data, data_geo, output_file
-    ).city_outputs()  # initialize output to a file
-    create_output_format(
+    ).city_outputs()
+    create_output_format(  # initialize output to a db
         weather_data, data_geo, file_db
-    ).city_outputs()  # initialize output to a db
+    ).city_outputs()
     return to_display(weather_data, data_geo)  # initialize output to str form
 
 
