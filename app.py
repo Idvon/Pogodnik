@@ -2,7 +2,10 @@ import json
 from pathlib import Path
 
 from flask import Flask, redirect, render_template, request, url_for
-from wtforms import Form, StringField  # type: ignore # https://github.com/wtforms/wtforms/issues/618
+from wtforms import (  # type: ignore # https://github.com/wtforms/wtforms/issues/618
+    Form,
+    StringField,
+)
 
 from PoGoDnIk import get_city_geo_data, get_city_list, get_config, main
 
