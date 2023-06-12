@@ -20,6 +20,7 @@ def test_json_geo_config():
     assert json_parser.get_geo_config() == GeoConfig(
         "Saint Petersburg",
         "openweather",
+        5,
         "geo api key",
     )
 

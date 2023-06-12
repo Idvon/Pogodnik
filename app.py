@@ -1,9 +1,8 @@
 import json
-from os import getenv
 from pathlib import Path
 
 from flask import Flask, redirect, render_template, request, url_for
-from wtforms import Form, StringField
+from wtforms import Form, StringField  # type: ignore # https://github.com/wtforms/wtforms/issues/618
 
 from PoGoDnIk import get_city_geo_data, get_city_list, get_config, main
 
@@ -16,7 +15,7 @@ class MyForm(Form):
 
 
 def get_net_config(city_name: str):
-    file_config = Path(getenv("FILE_CONFIG"))
+    file_config = Path("config.json")
     with open(file_config) as f:
         config_data = json.load(f)
     config_data["city_name"] = city_name
@@ -45,7 +44,7 @@ def response():
 
 @APP.route("/data/<int:num>")
 def data(num):
-    file_output = Path(getenv("FILE_OUTPUT"))
+    file_output = Path("out.csv")
     file_config = Path("net_config.json")
     geo_config, weather_config, timeout = get_config(file_config)
     geo_provider, city_list = get_city_list(geo_config)

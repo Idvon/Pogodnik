@@ -42,6 +42,6 @@ def test_db_writer_city_data(mocked_connect):
             0.62,
             "London",
             "GB",
-            "",
+            "England",
         ),
     )

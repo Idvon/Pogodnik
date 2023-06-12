@@ -5,8 +5,8 @@ from freezegun import freeze_time
 
 from src.structures import Coords, GeoConfig, GeoData, WeatherConfig, WeatherData
 
-GEO_CONFIG = GeoConfig("London", "provider", 0, "api_key")
-GEO_DATA = GeoData("London", "GB", "")
+GEO_CONFIG = GeoConfig("London", "provider", 2, "api_key")
+GEO_DATA = GeoData("London", "GB", "England")
 COORDS = Coords(51.5085, -0.1257)
 
 OW_WEATHER_CONFIG = WeatherConfig("openweather", "api_key")
@@ -102,6 +102,7 @@ GEOCODING_RESPONSE = [
         "lat": 51.5085,
         "lon": -0.1257,
         "country": "GB",
+        "state": "England",
     },
     {
         "name": "London",
@@ -111,6 +112,7 @@ GEOCODING_RESPONSE = [
         "lat": 42.9834,
         "lon": -81.233,
         "country": "CA",
+        "state": "Ontario",
     },
 ]
 GEOCODING_ERROR_RESPONSE = {"cod": 429}
