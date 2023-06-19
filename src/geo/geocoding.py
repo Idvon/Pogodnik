@@ -8,14 +8,14 @@ from src.structures import Coords, GeoConfig, GeoData
 
 class GeoProvider:
     config: dict
-    list_city: list
+    city_list: list
 
     def get_coords(self) -> Coords:
         return Coords(self.config["lat"], self.config["lon"])
 
     def get_city_data(self) -> GeoData:
         return GeoData(
-            self.config["name"], self.config["country"], self.config["state"]
+            self.config["name"], self.config["country"], self.config.get("state", "")
         )
 
 
@@ -27,11 +27,20 @@ class OpenWeatherGeoProvider(GeoProvider):
             "appid": geo_config.api_key,
         }
         url = "https://api.openweathermap.org/geo/1.0/direct"
-        self.list_city = get(url, params=payload).json()
-        if len(self.list_city) == 0:
+        match get(url, params=payload).json():
+            case []:
+                raise ProviderNoDataError("This city is not found. Please, check city name")
+            case {'cod': 401, **args}:
+                raise ProviderNoDataError("Please, check geo API key")
+            case valid_list:
+                self.city_list = valid_list
+        '''
+        self.city_list = get(url, params=payload).json()
+        if not self.city_list:
             raise ProviderNoDataError("This city is not found. Please, check city name")
-        if (isinstance(self.list_city, dict)) and (self.list_city["cod"] is not None):
+        if (isinstance(self.city_list, dict)) and (self.city_list["cod"] is not None):
             raise ProviderNoDataError("Please, check geo API key")
+        '''
 
 
 PROVIDERS = {"openweather": OpenWeatherGeoProvider}

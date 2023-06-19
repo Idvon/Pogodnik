@@ -36,7 +36,7 @@ def get_config(config: Path):
 # getting a list of cities
 def get_city_list(config: GeoConfig):
     provider = create_geo_provider(config)
-    list_city = provider.list_city
+    list_city = provider.city_list
     town_list = dict()
     for city in list_city:
         town_list[
@@ -46,7 +46,7 @@ def get_city_list(config: GeoConfig):
 
 
 def get_city_geo_data(provider: GeoProvider, number: int):
-    provider.config = provider.list_city[number]
+    provider.config = provider.city_list[number]
     get_coords = provider.get_coords()
     get_city_data = provider.get_city_data()
     return get_coords, get_city_data
@@ -91,8 +91,6 @@ def main(
 if __name__ == "__main__":
     file_config, file_output = parser_terminal()
     geo_config, weather_config, timeout = get_config(file_config)
-    geo_provider, city_list = get_city_list(geo_config)
-    print("\n".join([f"{elem}. {city_list[elem]}" for elem in city_list]))
-    num = int(input("Please write number your city: "))
-    coords, city_geo_data = get_city_geo_data(geo_provider, num - 1)
+    geo_provider = create_geo_provider(geo_config)
+    coords, city_geo_data = get_city_geo_data(geo_provider, 0)
     print(main(geo_config, weather_config, coords, city_geo_data, file_output, timeout))
