@@ -13,7 +13,6 @@ class ConfigFileParser:
 
     def get_geo_config(self) -> GeoConfig:  # formation of geo config
         return GeoConfig(
-            self.config["city_name"],
             self.config["geo_provider"]["name"],
             self.config["geo_provider"]["limit"],
             self.config["geo_provider"]["api_key"],
@@ -27,6 +26,9 @@ class ConfigFileParser:
 
     def get_timeout(self) -> int:
         return self.config["timeout"]
+
+    def get_city_name(self) -> str:
+        return self.config["city_name"]
 
 
 class JSONParser(ConfigFileParser):

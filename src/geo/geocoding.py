@@ -20,9 +20,9 @@ class GeoProvider:
 
 
 class OpenWeatherGeoProvider(GeoProvider):
-    def __init__(self, geo_config: GeoConfig):
+    def __init__(self, geo_config: GeoConfig, city_name: str):
         payload: Dict[str, Union[int, str]] = {
-            "q": geo_config.city_name,
+            "q": city_name,
             "limit": geo_config.limit,
             "appid": geo_config.api_key,
         }
@@ -39,8 +39,8 @@ class OpenWeatherGeoProvider(GeoProvider):
 PROVIDERS = {"openweather": OpenWeatherGeoProvider}
 
 
-def create_geo_provider(geo_config: GeoConfig) -> GeoProvider:
+def create_geo_provider(geo_config: GeoConfig, city_name: str) -> GeoProvider:
     provider = geo_config.provider
     if provider in PROVIDERS.keys():
-        return PROVIDERS[provider](geo_config)
+        return PROVIDERS[provider](geo_config, city_name)
     raise ProviderCreationError("Please, check geo provider name")

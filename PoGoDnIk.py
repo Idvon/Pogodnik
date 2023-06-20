@@ -30,12 +30,13 @@ def get_config(config: Path):
     get_geo_config = config_parser.get_geo_config()
     get_weather_config = config_parser.get_weather_config()
     get_timeout = config_parser.get_timeout()
-    return get_geo_config, get_weather_config, get_timeout
+    get_city_name = config_parser.get_city_name()
+    return get_geo_config, get_weather_config, get_timeout, get_city_name
 
 
 # getting a list of cities
-def get_city_list(config: GeoConfig):
-    provider = create_geo_provider(config)
+def get_city_list(config: GeoConfig, city_name: str):
+    provider = create_geo_provider(config, city_name)
     list_city = provider.city_list
     town_list = dict()
     for city in list_city:
@@ -53,18 +54,18 @@ def get_city_geo_data(provider: GeoProvider, number: int):
 
 
 def main(
-    config_geo: GeoConfig,
     config_weather: WeatherConfig,
     crd: Coords,
     data_geo: GeoData,
     output_file: Path,
     time_out: int,
+    city_name: str,
 ):
     # cache initialization
     file_db = Path("db.sqlite3")
     if file_db.is_file():
         local_weather_provider = create_local_weather_provider(
-            file_db, config_geo.city_name, time_out
+            file_db, city_name, time_out
         )
         try:
             weather_cache, geo_cache = local_weather_provider.weather_data()
@@ -90,7 +91,7 @@ def main(
 
 if __name__ == "__main__":
     file_config, file_output = parser_terminal()
-    geo_config, weather_config, timeout = get_config(file_config)
-    geo_provider = create_geo_provider(geo_config)
+    geo_config, weather_config, timeout, town_name = get_config(file_config)
+    geo_provider = create_geo_provider(geo_config, town_name)
     coords, city_geo_data = get_city_geo_data(geo_provider, 0)
-    print(main(geo_config, weather_config, coords, city_geo_data, file_output, timeout))
+    print(main(weather_config, coords, city_geo_data, file_output, timeout, town_name))
