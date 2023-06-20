@@ -8,10 +8,6 @@ from PoGoDnIk import get_city_geo_data, get_city_list, get_config, main
 APP = Flask(__name__)
 
 
-class MyForm(Form):
-    city_name = StringField("City Name")
-
-
 def get_net_config(city_name: str):
     file_config = Path("config.json")
     with open(file_config) as f:
@@ -24,12 +20,11 @@ def get_net_config(city_name: str):
 
 @APP.route("/", methods=["GET", "POST"])
 def web_conclusion():
-    form = MyForm(request.form)
     if request.method == "POST":
-        city_name = request.form.get("city_name")
+        city_name = request.form['city_name']
         get_net_config(city_name)
         return redirect(url_for("response"))
-    return render_template("index.html", city_name=form)
+    return render_template("index.html")
 
 
 @APP.route("/response", methods=["GET", "POST"])

@@ -1,4 +1,4 @@
-<html lang=en>
+<html lang="en">
     <head>
         <title>FlaskApp</title>
         <style>
@@ -8,15 +8,15 @@
             }
         </style>
     </head>
-    <body bgcolor=black>
-        <h1 class=head>Welcome to PoGoDnIk!</h1>
-        <h2 class=head>Enter the city name:</h2>
-        <form method=post>
-            <dl>
-                {{  city_name.city_name  }}
-            </dl>
+    <body bgcolor="black">
+        <h1 class="head">Welcome to PoGoDnIk!</h1>
+        <h2 class="head">Enter the city name:</h2>
+        <form method="post">
+            <input type="text"
+                   placeholder="City Name"
+                   name="city_name"/>
             <p>
-                <input type=submit value="Dai mne weather"/>
+                <button type="submit">Dai mne weather</button>
             </p>
         </form>
     </body>

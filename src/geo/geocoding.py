@@ -32,15 +32,8 @@ class OpenWeatherGeoProvider(GeoProvider):
                 raise ProviderNoDataError("This city is not found. Please, check city name")
             case {'cod': 401, **args}:
                 raise ProviderNoDataError("Please, check geo API key")
-            case valid_list:
+            case list() as valid_list:
                 self.city_list = valid_list
-        '''
-        self.city_list = get(url, params=payload).json()
-        if not self.city_list:
-            raise ProviderNoDataError("This city is not found. Please, check city name")
-        if (isinstance(self.city_list, dict)) and (self.city_list["cod"] is not None):
-            raise ProviderNoDataError("Please, check geo API key")
-        '''
 
 
 PROVIDERS = {"openweather": OpenWeatherGeoProvider}
