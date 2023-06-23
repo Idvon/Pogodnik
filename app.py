@@ -1,50 +1,50 @@
-import json
 from pathlib import Path
 
 from flask import Flask, redirect, render_template, request, url_for
 
-from PoGoDnIk import get_city_geo_data, get_city_list, get_config, main
+from PoGoDnIk import main, get_cache
+from src.config_file_parser.file_parser import create_parser
+from src.geo.geocoding import create_geo_provider
 
 APP = Flask(__name__)
-
-
-def get_net_config(city_name: str):
-    file_config = Path("config.json")
-    with open(file_config) as f:
-        config_data = json.load(f)
-    config_data["city_name"] = city_name
-    file_config = Path("net_config.json")
-    with open(file_config, "w") as f:
-        json.dump(config_data, f)
 
 
 @APP.route("/", methods=["GET", "POST"])
 def web_conclusion():
     if request.method == "POST":
         city_name = request.form['city_name']
-        get_net_config(city_name)
-        return redirect(url_for("response"))
+        return redirect(url_for("response", city=city_name))
     return render_template("index.html")
 
 
-@APP.route("/response", methods=["GET", "POST"])
-def response():
-    file_config = Path("net_config.json")
-    geo_config, weather_config, timeout = get_config(file_config)
-    geo_provider, city_list = get_city_list(geo_config)
-    return render_template("response.html", city_list=city_list)
+@APP.route("/response/<city>")
+def response(city):
+    file_db = Path("db.sqlite3")
+    config = Path("config.json")
+    if not config.is_file():
+        raise FileNotFoundError("Config file not found")
+    config_parser = create_parser(config)
+    geo_config = config_parser.get_geo_config()
+    weather_config = config_parser.get_weather_config()
+    timeout = config_parser.get_timeout()
+    cache = get_cache(city, timeout, file_db)
+    if cache:
+        return redirect(url_for("data", city=cache))
+    else:
+        geo_provider = create_geo_provider(geo_config, city)
+        city_list = geo_provider.request()
+        town_list = dict()
+        for city in city_list:
+            town_list[
+                city_list.index(city) + 1
+                ] = f"name: {city['name']}, country: {city['country']}, state: {city['state']}"
+    return render_template("response.html", city_list=town_list)
 
 
 @APP.route("/data/<int:num>")
 def data(num):
-    file_output = Path("out.csv")
-    file_config = Path("net_config.json")
-    geo_config, weather_config, timeout = get_config(file_config)
-    geo_provider, city_list = get_city_list(geo_config)
-    coords, city_geo_data = get_city_geo_data(geo_provider, num - 1)
+    output = Path("out.csv")
+    file_db = Path("db.sqlite3")
     return render_template(
         "data.html",
-        data=main(
-            geo_config, weather_config, coords, city_geo_data, file_output, timeout
-        ),
-    )
+        data=main(weather_config, output, file_db))

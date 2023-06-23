@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import Dict, Union, Optional
 
 from requests import get
 
@@ -7,33 +7,36 @@ from src.structures import Coords, GeoConfig, GeoData
 
 
 class GeoProvider:
-    config: dict
-    city_list: list
+    response: dict
+    url: str
+    payload: dict
 
-    def get_coords(self) -> Coords:
-        return Coords(self.config["lat"], self.config["lon"])
-
-    def get_city_data(self) -> GeoData:
-        return GeoData(
-            self.config["name"], self.config["country"], self.config.get("state", "")
-        )
-
-
-class OpenWeatherGeoProvider(GeoProvider):
-    def __init__(self, geo_config: GeoConfig, city_name: str):
-        payload: Dict[str, Union[int, str]] = {
-            "q": city_name,
-            "limit": geo_config.limit,
-            "appid": geo_config.api_key,
-        }
-        url = "https://api.openweathermap.org/geo/1.0/direct"
-        match get(url, params=payload).json():
+    def request(self) -> Union[Optional[list], dict]:
+        match get(self.url, params=self.payload).json():
             case []:
                 raise ProviderNoDataError("This city is not found. Please, check city name")
             case {'cod': 401, **args}:
                 raise ProviderNoDataError("Please, check geo API key")
             case list() as valid_list:
-                self.city_list = valid_list
+                return valid_list
+
+    def get_coords(self) -> Coords:
+        return Coords(self.response["lat"], self.response["lon"])
+
+    def get_city_data(self) -> GeoData:
+        return GeoData(
+            self.response["name"], self.response["country"], self.response.get("state", "")
+        )
+
+
+class OpenWeatherGeoProvider(GeoProvider):
+    def __init__(self, geo_config: GeoConfig, city_name: str):
+        self.payload: Dict[str, Union[int, str]] = {
+            "q": city_name,
+            "limit": geo_config.limit,
+            "appid": geo_config.api_key,
+        }
+        self.url = "https://api.openweathermap.org/geo/1.0/direct"
 
 
 PROVIDERS = {"openweather": OpenWeatherGeoProvider}
