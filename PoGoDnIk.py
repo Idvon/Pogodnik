@@ -5,7 +5,7 @@ from src.config_file_parser.file_parser import create_parser
 from src.exceptions import ProviderNoDataError
 from src.geo.geocoding import create_geo_provider
 from src.output.conclusion import create_output_format, to_display
-from src.structures import WeatherConfig
+from src.structures import WeatherConfig, GeoConfig
 from src.weather.weathercoding import (
     create_local_weather_provider,
     create_net_weather_provider,
@@ -25,10 +25,15 @@ def get_cache(name: str, time_out: int, db: Path):
 
 
 def main(
+    config_geo: GeoConfig,
     config_weather: WeatherConfig,
+    name_city: str,
     output_file: Path,
-    db: Path
+    db: Path,
+    num: int
 ):
+    geo_provider = create_geo_provider(config_geo, name_city)
+    geo_provider.response = geo_provider.request()[num]
     coords = geo_provider.get_coords()
     geo_data = geo_provider.get_city_data()
 
@@ -69,6 +74,4 @@ if __name__ == "__main__":
     if cache:
         print(cache)
     else:
-        geo_provider = create_geo_provider(geo_config, city_name)
-        geo_provider.response = geo_provider.request()[0]
-        print(main(weather_config, output, file_db))
+        print(main(geo_config, weather_config, city_name, output, file_db, 0))
