@@ -12,10 +12,11 @@ from src.weather.weathercoding import (
 )
 
 
-def get_cache(name: str, time_out: int, db: Path):
-    if db.is_file():
+def get_cache(name: str, time_out: int):
+    file_db = Path("db.sqlite3")
+    if file_db.is_file():
         local_weather_provider = create_local_weather_provider(
-            db, name, time_out
+            file_db, name, time_out
         )
         try:
             weather_cache, geo_cache = local_weather_provider.weather_data()
@@ -29,9 +30,9 @@ def main(
     config_weather: WeatherConfig,
     name_city: str,
     output_file: Path,
-    db: Path,
     num: int
 ):
+    file_db = Path("db.sqlite3")
     geo_provider = create_geo_provider(config_geo, name_city)
     geo_provider.response = geo_provider.request()[num]
     coords = geo_provider.get_coords()
@@ -48,13 +49,12 @@ def main(
         weather_data, geo_data, output_file
     ).city_outputs()
     create_output_format(  # initialize output to a db
-        weather_data, geo_data, db
+        weather_data, geo_data, file_db
     ).city_outputs()
     return to_display(weather_data, geo_data)  # initialize output to str form
 
 
 if __name__ == "__main__":
-    file_db = Path("db.sqlite3")
     parser = argparse.ArgumentParser(description="Weather by config file")
     parser.add_argument("--config", type=str)
     parser.add_argument("--output", type=str)
@@ -70,8 +70,8 @@ if __name__ == "__main__":
     timeout = config_parser.get_timeout()
     city_name = config_parser.get_city_name()
 
-    cache = get_cache(city_name, timeout, file_db)
+    cache = get_cache(city_name, timeout)
     if cache:
         print(cache)
     else:
-        print(main(geo_config, weather_config, city_name, output, file_db, 0))
+        print(main(geo_config, weather_config, city_name, output, 0))

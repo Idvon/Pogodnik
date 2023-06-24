@@ -27,10 +27,9 @@ def web_conclusion():
 
 @APP.route("/response/<city>")
 def response(city):
-    file_db = Path("db.sqlite3")
     geo_config = get_config().get_geo_config()
     timeout = get_config().get_timeout()
-    cache = get_cache(city, timeout, file_db)
+    cache = get_cache(city, timeout)
     if cache:
         return render_template("data.html", data=cache)
     else:
@@ -41,15 +40,13 @@ def response(city):
             town_list[
                 city_list.index(elem) + 1
                 ] = f"name: {elem['name']}, country: {elem['country']}, state: {elem['state']}"
-    return render_template("response.html", city_list=town_list, city=city)
+        return render_template("response.html", city_list=town_list, city=city)
 
 
 @APP.route("/data/<int:num>/<city>")
 def data(num, city):
     output = Path("out.csv")
-    file_db = Path("db.sqlite3")
     weather_config = get_config().get_weather_config()
     geo_config = get_config().get_geo_config()
-    return render_template(
-        "data.html",
-        data=main(geo_config, weather_config, city, output, file_db, num - 1))
+    weather = main(geo_config, weather_config, city, output, num - 1)
+    return render_template("data.html", data=weather)
