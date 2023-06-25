@@ -18,7 +18,6 @@ def test_error_parser():
 def test_json_geo_config():
     assert isinstance(json_parser, JSONParser)
     assert json_parser.get_geo_config() == GeoConfig(
-        "Saint Petersburg",
         "openweather",
         5,
         "geo api key",

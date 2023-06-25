@@ -4,8 +4,8 @@ import requests
 import requests_mock
 from freezegun import freeze_time
 
-from src.weather.weathercoding import (
-    DBWeatherProvider,
+from src.weather.providers.local import DBWeatherProvider
+from src.weather.providers.network import (
     OpenMeteoWeatherProvider,
     OpenWeatherWeatherProvider,
     create_net_weather_provider,
@@ -61,7 +61,7 @@ def test_net_provider_creation():
 
 
 @freeze_time("2023-01-01 00:00:00.000000+00:00")
-@patch("src.weather.weathercoding.sqlite3")
+@patch("src.weather.providers.local.sqlite3")
 def test_db_weather_provider(mocked_connect):
     mc = mocked_connect.connect().cursor().fetchall
     mc.return_value = [

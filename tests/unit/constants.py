@@ -5,7 +5,7 @@ from freezegun import freeze_time
 
 from src.structures import Coords, GeoConfig, GeoData, WeatherConfig, WeatherData
 
-GEO_CONFIG = GeoConfig("London", "provider", 2, "api_key")
+GEO_CONFIG = GeoConfig("provider", 2, "api_key")
 GEO_DATA = GeoData("London", "GB", "England")
 COORDS = Coords(51.5085, -0.1257)
 
@@ -16,7 +16,7 @@ OM_WEATHER_CONFIG = WeatherConfig("openmeteo", "")
 OM_URL = "https://api.open-meteo.com/v1/forecast"
 
 LOCAL_FILE = Path("db.sqlite3")
-LOCAL_CITY = GEO_CONFIG.city_name
+LOCAL_CITY = "London"
 LOCAL_TIMEOUT = 1
 
 with freeze_time("2023-01-01 00:00:00.000000+00:00"):
@@ -115,4 +115,4 @@ GEOCODING_RESPONSE = [
         "state": "Ontario",
     },
 ]
-GEOCODING_ERROR_RESPONSE = {"cod": 429}
+GEOCODING_ERROR_RESPONSE = {"cod": 401, "message": "Invalid"}

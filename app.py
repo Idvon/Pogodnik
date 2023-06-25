@@ -2,7 +2,7 @@ from pathlib import Path
 
 from flask import Flask, redirect, render_template, request, url_for
 
-from PoGoDnIk import main, get_cache
+from PoGoDnIk import get_cache, main
 from src.config_file_parser.file_parser import create_parser
 from src.geo.geocoding import create_geo_provider
 
@@ -20,7 +20,7 @@ def get_config():
 @APP.route("/", methods=["GET", "POST"])
 def web_conclusion():
     if request.method == "POST":
-        city_name = request.form['city_name']
+        city_name = request.form["city_name"]
         return redirect(url_for("response", city=city_name))
     return render_template("index.html")
 
@@ -39,7 +39,7 @@ def response(city):
         for elem in city_list:
             town_list[
                 city_list.index(elem) + 1
-                ] = f"name: {elem['name']}, country: {elem['country']}, state: {elem['state']}"
+            ] = f"name: {elem['name']}, country: {elem['country']}, state: {elem['state']}"
         return render_template("response.html", city_list=town_list, city=city)
 
 

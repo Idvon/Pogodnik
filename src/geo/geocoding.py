@@ -1,4 +1,4 @@
-from typing import Dict, Union, Optional
+from typing import Dict, List, Union
 
 from requests import get
 
@@ -11,21 +11,25 @@ class GeoProvider:
     url: str
     payload: dict
 
-    def request(self) -> Union[Optional[list], dict]:
-        match get(self.url, params=self.payload).json():
+    def request(self) -> List[Dict[int, str]]:
+        valid_list = get(self.url, params=self.payload).json()
+        match valid_list:
             case []:
-                raise ProviderNoDataError("This city is not found. Please, check city name")
-            case {'cod': 401, **args}:
+                raise ProviderNoDataError(
+                    "This city is not found. Please, check city name"
+                )
+            case {"cod": 401, **args}:
                 raise ProviderNoDataError("Please, check geo API key")
-            case list() as valid_list:
-                return valid_list
+        return valid_list
 
     def get_coords(self) -> Coords:
         return Coords(self.response["lat"], self.response["lon"])
 
     def get_city_data(self) -> GeoData:
         return GeoData(
-            self.response["name"], self.response["country"], self.response.get("state", "")
+            self.response["name"],
+            self.response["country"],
+            self.response.get("state", ""),
         )
 
 

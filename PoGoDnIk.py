@@ -5,19 +5,15 @@ from src.config_file_parser.file_parser import create_parser
 from src.exceptions import ProviderNoDataError
 from src.geo.geocoding import create_geo_provider
 from src.output.conclusion import create_output_format, to_display
-from src.structures import WeatherConfig, GeoConfig
-from src.weather.weathercoding import (
-    create_local_weather_provider,
-    create_net_weather_provider,
-)
+from src.structures import GeoConfig, WeatherConfig
+from src.weather.providers.local import create_local_weather_provider
+from src.weather.providers.network import create_net_weather_provider
 
 
 def get_cache(name: str, time_out: int):
     file_db = Path("db.sqlite3")
     if file_db.is_file():
-        local_weather_provider = create_local_weather_provider(
-            file_db, name, time_out
-        )
+        local_weather_provider = create_local_weather_provider(file_db, name, time_out)
         try:
             weather_cache, geo_cache = local_weather_provider.weather_data()
             return to_display(weather_cache, geo_cache)
@@ -30,7 +26,7 @@ def main(
     config_weather: WeatherConfig,
     name_city: str,
     output_file: Path,
-    num: int
+    num: int,
 ):
     file_db = Path("db.sqlite3")
     geo_provider = create_geo_provider(config_geo, name_city)
