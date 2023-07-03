@@ -48,8 +48,8 @@ class DatabaseWriter(CityData):
                 winddeg integer,
                 windspeed real,
                 city text,
-                state text,
-                country text)
+                country text,
+                state text)
                 """
             cursor = sqlite_connection.cursor()
             cursor.execute(headers)

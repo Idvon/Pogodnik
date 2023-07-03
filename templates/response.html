@@ -1,0 +1,23 @@
+<html lang="en">
+    <head>
+        <title>FlaskApp</title>
+        <style>
+            .text{
+            font-family: "Comic Sans", sans-serif;
+            color: white;
+            }
+        </style>
+    </head>
+    <body bgcolor="black">
+        <form method="post">
+            <p class="text">
+                {% for key, val in city_list.items() %}
+                <a href="{{ url_for('data', num=key, city=city) }}">{{ key }}. {{ val }}</a>
+                    {% if not loop.last %}
+                     <br/>
+                    {% endif %}
+                {% endfor %}
+            </p>
+        </form>
+    </body>
+</html>>

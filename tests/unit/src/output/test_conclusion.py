@@ -26,8 +26,8 @@ def test_db_writer_city_data(mocked_connect):
                 winddeg integer,
                 windspeed real,
                 city text,
-                state text,
-                country text)
+                country text,
+                state text)
                 """
     )
     mc.assert_called_with(
@@ -41,7 +41,7 @@ def test_db_writer_city_data(mocked_connect):
             349,
             0.62,
             "London",
-            "",
             "GB",
+            "England",
         ),
     )

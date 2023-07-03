@@ -1,20 +1,23 @@
-<html>
-<head>
-    <title>FlaskApp</title>
-    <style>
-        .head{
-        font-family: "Impact", sans-serif;
-        color: white;
-        }
-        .text{
-        width: 200px;
-        font-family: "Comic Sans", sans-serif;
-        color: white;
-        }
-    </style>
-</head>
-<body bgcolor="black">
-    <h1 class="head">Welcome to PoGoDnIk!</h1>
-    <p class="text">{{data}}</p>
-</body>
+<html lang="en">
+    <head>
+        <title>FlaskApp</title>
+        <style>
+            .head{
+            font-family: "Impact", sans-serif;
+            color: white;
+            }
+        </style>
+    </head>
+    <body bgcolor="black">
+        <h1 class="head">Welcome to PoGoDnIk!</h1>
+        <h2 class="head">Enter the city name:</h2>
+        <form method="post">
+            <input type="text"
+                   placeholder="City Name"
+                   name="city_name"/>
+            <p>
+                <button type="submit">Dai mne weather</button>
+            </p>
+        </form>
+    </body>
 </html>>
