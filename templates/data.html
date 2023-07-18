@@ -1,0 +1,22 @@
+<html lang="en">
+    <head>
+        <title>FlaskApp</title>
+        <style>
+            .text{
+            font-family: "Comic Sans", sans-serif;
+            color: white;
+            }
+        </style>
+    </head>
+    <body bgcolor="black">
+        <p class="text">
+            {% set data = data.split('\n') %}
+            {% for item in data %}
+            {{ item }}
+                {% if not loop.last %}
+                 <br/>
+                {% endif %}
+            {% endfor %}
+        </p>
+    </body>
+</html>>

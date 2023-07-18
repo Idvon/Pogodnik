@@ -3,8 +3,8 @@ from typing import NamedTuple
 
 
 class GeoConfig(NamedTuple):
-    city_name: str
     provider: str
+    limit: int
     api_key: str
 
 
@@ -15,8 +15,8 @@ class WeatherConfig(NamedTuple):
 
 class GeoData(NamedTuple):
     city: str
-    state: str
     country: str
+    state: str | None
 
 
 class Coords(NamedTuple):
