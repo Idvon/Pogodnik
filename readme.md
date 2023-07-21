@@ -58,13 +58,13 @@ By openweather
 flask run
 ```
 Окно ввода города:
-![](https://git.wearentsa.me/DD/Pogodnik/src/branch/main/readme/docs/welcome.png)
+![](./docs/welcome.png)
 
 Выбор города из списка найденых (от 1 до 5):
-![](https://git.wearentsa.me/DD/Pogodnik/src/branch/main/readme/docs/cities.png)
+![](./docs/cities.png)
 
 Получение информации:
-![](https://git.wearentsa.me/DD/Pogodnik/src/branch/main/readme/docs/weather.png)
+![](./docs/weather.png)
 
 **4. База данных**
 
