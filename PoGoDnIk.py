@@ -9,11 +9,12 @@ from src.structures import GeoConfig, WeatherConfig
 from src.weather.providers.local import create_local_weather_provider
 from src.weather.providers.network import create_net_weather_provider
 
+FILE_DB = Path("db.sqlite3")
+
 
 def get_cache(name: str, time_out: int):
-    file_db = Path("db.sqlite3")
-    if file_db.is_file():
-        local_weather_provider = create_local_weather_provider(file_db, name, time_out)
+    if FILE_DB.is_file():
+        local_weather_provider = create_local_weather_provider(FILE_DB, name, time_out)
         try:
             weather_cache, geo_cache = local_weather_provider.weather_data()
             return to_display(weather_cache, geo_cache)
@@ -28,7 +29,6 @@ def main(
     output_file: Path,
     num: int,
 ):
-    file_db = Path("db.sqlite3")
     geo_provider = create_geo_provider(config_geo, name_city)
     geo_provider.response = geo_provider.request()[num]
     coords = geo_provider.get_coords()
@@ -45,7 +45,7 @@ def main(
         weather_data, geo_data, output_file
     ).city_outputs()
     create_output_format(  # initialize output to a db
-        weather_data, geo_data, file_db
+        weather_data, geo_data, FILE_DB
     ).city_outputs()
     return to_display(weather_data, geo_data)  # initialize output to str form
 

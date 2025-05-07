@@ -7,13 +7,13 @@ from src.config_file_parser.file_parser import create_parser
 from src.geo.geocoding import create_geo_provider
 
 APP = Flask(__name__)
+CONFIG = Path("config.json")
 
 
 def get_config():
-    config = Path("config.json")
-    if not config.is_file():
+    if not CONFIG.is_file():
         raise FileNotFoundError("Config file not found")
-    config_parser = create_parser(config)
+    config_parser = create_parser(CONFIG)
     return config_parser
 
 
