@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 
 from flask import Flask, redirect, render_template, request, url_for
@@ -50,6 +51,6 @@ def data(num, city):
     output = Path("out.csv")
     weather_config = get_config().get_weather_config()
     geo_config = get_config().get_geo_config()
-    weather = main(geo_config, weather_config, city, output, num - 1)
+    weather = asyncio.run(main(geo_config, weather_config, city, output, num - 1))
     city_data = to_display(weather[0], weather[1])
     return render_template("data.html", data=city_data)
