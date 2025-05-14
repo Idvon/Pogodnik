@@ -5,6 +5,7 @@ from flask import Flask, redirect, render_template, request, url_for
 from PoGoDnIk import get_cache, main
 from src.config_file_parser.file_parser import create_parser
 from src.geo.geocoding import create_geo_provider
+from src.output.conclusion import to_display
 
 APP = Flask(__name__)
 CONFIG = Path("config.json")
@@ -31,7 +32,8 @@ def response(city):
     timeout = get_config().get_timeout()
     cache = get_cache(city, timeout)
     if cache:
-        return render_template("data.html", data=cache)
+        cdata = to_display(cache[0], cache[1])
+        return render_template("data.html", data=cdata)
     else:
         geo_provider = create_geo_provider(geo_config, city)
         city_list = geo_provider.request()
@@ -49,4 +51,5 @@ def data(num, city):
     weather_config = get_config().get_weather_config()
     geo_config = get_config().get_geo_config()
     weather = main(geo_config, weather_config, city, output, num - 1)
-    return render_template("data.html", data=weather)
+    city_data = to_display(weather[0], weather[1])
+    return render_template("data.html", data=city_data)

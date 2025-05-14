@@ -1,6 +1,7 @@
 import abc
 import csv
 import sqlite3
+import asyncio
 from pathlib import Path
 
 from src.exceptions import ProviderCreationError
@@ -68,7 +69,7 @@ class DatabaseWriter(CityData):
 WRITER = {".csv": CSVFileWriter, ".sqlite3": DatabaseWriter}
 
 
-def create_output_format(
+async def create_output_format(
     weather_data: WeatherData, geo_data: GeoData, file_out: Path
 ) -> CityData:
     form = file_out.suffix
