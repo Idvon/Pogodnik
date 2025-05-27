@@ -3,7 +3,7 @@ from pathlib import Path
 
 from flask import Flask, redirect, render_template, request, url_for
 
-from PoGoDnIk import get_cache, main
+from PoGoDnIk import get_cache, main, to_cache
 from src.config_file_parser.file_parser import create_parser
 from src.geo.geocoding import create_geo_provider
 from src.output.conclusion import to_display
@@ -51,6 +51,7 @@ def data(num, city):
     output = Path("out.csv")
     weather_config = get_config().get_weather_config()
     geo_config = get_config().get_geo_config()
-    weather = asyncio.run(main(geo_config, weather_config, city, output, num - 1))
-    city_data = to_display(weather[0], weather[1])
-    return render_template("data.html", data=city_data)
+    city_data = asyncio.run(main(geo_config, weather_config, city, num - 1))
+    asyncio.run(to_cache(city_data[0], city_data[1], output))
+    data_template = to_display(city_data[0], city_data[1])
+    return render_template("data.html", data=data_template)

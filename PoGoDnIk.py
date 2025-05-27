@@ -28,27 +28,20 @@ def get_cache(name: str, time_out: int) -> Union[Tuple[Any, Any] | None]:
 async def to_cache(weather_data: WeatherData, geo_data: GeoData, output_file: Path):
 
     async with asyncio.TaskGroup() as tg:
-        task = tg.create_task(create_output_format(weather_data, geo_data, output_file))
-        task2 = tg.create_task(create_output_format(weather_data, geo_data, FILE_DB))
-        task = await task
-        task2 = await task2
+        # initialize output to a file
+        to_out_file = tg.create_task(create_output_format(weather_data, geo_data, output_file))
+        # initialize output to a db
+        to_db_file = tg.create_task(create_output_format(weather_data, geo_data, FILE_DB))
+        task = await to_out_file
+        task2 = await to_db_file
         task.city_outputs()
         task2.city_outputs()
-"""    task = await create_output_format(  # initialize output to a file
-        weather_data, geo_data, output_file
-        )
-    task2 = await create_output_format(  # initialize output to a db
-        weather_data, geo_data, FILE_DB
-        )
-    task.city_outputs()
-    task2.city_outputs()"""
 
 
 async def main(
         config_geo: GeoConfig,
         config_weather: WeatherConfig,
         name_city: str,
-        output_file: Path,
         num: int,
 ):
     geo_provider = create_geo_provider(config_geo, name_city)
@@ -62,7 +55,6 @@ async def main(
     weather_data = net_weather_provider.weather_data(  # of the net provider
         net_weather_provider.request()
     )
-    # await to_cache(weather_data, geo_data, output_file)
     return weather_data, geo_data  # initialize output to str form
 
 
@@ -88,10 +80,10 @@ if __name__ == "__main__":
     cache = get_cache(city_name, timeout)
 
     if cache:
-        data = cache
+        city_data = cache
     else:
-        data = asyncio.run(main(geo_config, weather_config, city_name, output, 0))
-        asyncio.run(to_cache(data[0], data[1], output))
+        city_data = asyncio.run(main(geo_config, weather_config, city_name, 0))
+        asyncio.run(to_cache(city_data[0], city_data[1], output))
 
-    print(to_display(data[0], data[1]))
+    print(to_display(city_data[0], city_data[1]))
     print(time.time() - start_time)
