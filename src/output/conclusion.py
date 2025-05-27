@@ -1,7 +1,6 @@
 import abc
 import csv
 import sqlite3
-import asyncio
 from pathlib import Path
 
 from src.exceptions import ProviderCreationError

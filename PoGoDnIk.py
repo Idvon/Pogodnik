@@ -27,14 +27,21 @@ def get_cache(name: str, time_out: int) -> Union[Tuple[Any, Any] | None]:
 
 async def to_cache(weather_data: WeatherData, geo_data: GeoData, output_file: Path):
 
-    task = await create_output_format(  # initialize output to a file
+    async with asyncio.TaskGroup() as tg:
+        task = tg.create_task(create_output_format(weather_data, geo_data, output_file))
+        task2 = tg.create_task(create_output_format(weather_data, geo_data, FILE_DB))
+        task = await task
+        task2 = await task2
+        task.city_outputs()
+        task2.city_outputs()
+"""    task = await create_output_format(  # initialize output to a file
         weather_data, geo_data, output_file
         )
     task2 = await create_output_format(  # initialize output to a db
         weather_data, geo_data, FILE_DB
         )
     task.city_outputs()
-    task2.city_outputs()
+    task2.city_outputs()"""
 
 
 async def main(
@@ -55,7 +62,7 @@ async def main(
     weather_data = net_weather_provider.weather_data(  # of the net provider
         net_weather_provider.request()
     )
-    await to_cache(weather_data, geo_data, output_file)
+    # await to_cache(weather_data, geo_data, output_file)
     return weather_data, geo_data  # initialize output to str form
 
 
@@ -84,7 +91,7 @@ if __name__ == "__main__":
         data = cache
     else:
         data = asyncio.run(main(geo_config, weather_config, city_name, output, 0))
-        #asyncio.run(to_cache(data[0], data[1], output))
+        asyncio.run(to_cache(data[0], data[1], output))
 
     print(to_display(data[0], data[1]))
     print(time.time() - start_time)
