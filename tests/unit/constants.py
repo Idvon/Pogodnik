@@ -17,7 +17,6 @@ OM_URL = "https://api.open-meteo.com/v1/forecast"
 
 LOCAL_FILE = Path("db.sqlite3")
 LOCAL_CITY = "London"
-LOCAL_TIMEOUT = 1
 
 with freeze_time("2023-01-01 00:00:00.000000+00:00"):
     OW_WEATHER_DATA = WeatherData(

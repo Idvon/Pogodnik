@@ -15,7 +15,6 @@ from tests.unit.constants import (
     GEO_DATA,
     LOCAL_CITY,
     LOCAL_FILE,
-    LOCAL_TIMEOUT,
     OM_RESPONSE,
     OM_URL,
     OM_WEATHER_CONFIG,
@@ -78,6 +77,6 @@ def test_db_weather_provider(mocked_connect):
             "England",
         )
     ]
-    provider = DBWeatherProvider(LOCAL_FILE, LOCAL_CITY, LOCAL_TIMEOUT)
+    provider = DBWeatherProvider(LOCAL_FILE, LOCAL_CITY)
     data = provider.weather_data()
     assert data == (OW_WEATHER_DATA, GEO_DATA)
