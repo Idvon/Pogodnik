@@ -1,49 +1,58 @@
 import argparse
 import asyncio
 import time
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Optional, Any, Union, Tuple
+from typing import Any, Tuple
 
 from src.config_file_parser.file_parser import create_parser
 from src.exceptions import ProviderNoDataError
 from src.geo.geocoding import create_geo_provider
 from src.output.conclusion import create_output_format, to_display
-from src.structures import GeoConfig, WeatherConfig, WeatherData, GeoData
+from src.structures import GeoConfig, GeoData, WeatherConfig, WeatherData
 from src.weather.providers.local import create_local_weather_provider
 from src.weather.providers.network import create_net_weather_provider
 
 FILE_DB = Path("db.sqlite3")
 
 
-def get_cache(name: str, time_out: int) -> Union[Tuple[Any, Any] | None]:
+def get_cache(name: str, time_out: int) -> Any:
+    delta = timedelta(minutes=time_out)
+    current_time = datetime.now(timezone.utc)
     if FILE_DB.is_file():
-        local_weather_provider = create_local_weather_provider(FILE_DB, name, time_out)
+        local_weather_provider = create_local_weather_provider(FILE_DB, name)
         try:
             weather_cache, geo_cache = local_weather_provider.weather_data()
-            return weather_cache, geo_cache
+            if (current_time - weather_cache.datetime) <= delta:
+                return weather_cache, geo_cache
         except ProviderNoDataError:
             pass
 
 
-async def to_cache(weather_data: WeatherData, geo_data: GeoData, output_file: Path):
-
+async def to_cache(
+    weather_data: WeatherData, geo_data: GeoData, output_file: Path
+) -> None:
     async with asyncio.TaskGroup() as tg:
         # initialize output to a file
-        to_out_file = tg.create_task(create_output_format(weather_data, geo_data, output_file))
-        # initialize output to a db
-        to_db_file = tg.create_task(create_output_format(weather_data, geo_data, FILE_DB))
+        to_out_file = tg.create_task(
+            create_output_format(weather_data, geo_data, output_file)
+        )
         task = await to_out_file
-        task2 = await to_db_file
         task.city_outputs()
+        # initialize output to a db
+        to_db_file = tg.create_task(
+            create_output_format(weather_data, geo_data, FILE_DB)
+        )
+        task2 = await to_db_file
         task2.city_outputs()
 
 
 async def main(
-        config_geo: GeoConfig,
-        config_weather: WeatherConfig,
-        name_city: str,
-        num: int,
-):
+    config_geo: GeoConfig,
+    config_weather: WeatherConfig,
+    name_city: str,
+    num: int,
+) -> Tuple[WeatherData, GeoData]:
     geo_provider = create_geo_provider(config_geo, name_city)
     geo_provider.response = geo_provider.request()[num]
     coords = geo_provider.get_coords()
