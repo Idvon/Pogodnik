@@ -1,6 +1,5 @@
 import argparse
 import asyncio
-import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Tuple
@@ -70,7 +69,6 @@ async def main(
 
 
 if __name__ == "__main__":
-    start_time = time.time()
     parser = argparse.ArgumentParser(description="Weather by config file")
     parser.add_argument("--config", type=str)
     parser.add_argument("--output", type=str)
@@ -97,4 +95,3 @@ if __name__ == "__main__":
         asyncio.run(to_cache(city_data[0], city_data[1], output))
 
     print(to_display(city_data[0], city_data[1]))
-    print(time.time() - start_time)

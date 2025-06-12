@@ -1,4 +1,3 @@
-import asyncio
 from pathlib import Path
 
 from flask import Flask, redirect, render_template, request, url_for
@@ -20,7 +19,7 @@ def get_config():
 
 
 @APP.route("/", methods=["GET", "POST"])
-def web_conclusion():
+async def web_conclusion():
     if request.method == "POST":
         city_name = request.form["city_name"]
         return redirect(url_for("response", city=city_name))
@@ -28,7 +27,7 @@ def web_conclusion():
 
 
 @APP.route("/response/<city>")
-def response(city):
+async def response(city):
     geo_config = get_config().get_geo_config()
     timeout = get_config().get_timeout()
     cache = get_cache(city, timeout)
@@ -47,11 +46,11 @@ def response(city):
 
 
 @APP.route("/data/<int:num>/<city>")
-def data(num, city):
+async def data(num, city):
     output = Path("out.csv")
     weather_config = get_config().get_weather_config()
     geo_config = get_config().get_geo_config()
-    city_data = asyncio.run(main(geo_config, weather_config, city, num - 1))
-    asyncio.run(to_cache(city_data[0], city_data[1], output))
+    city_data = await main(geo_config, weather_config, city, num - 1)
+    await to_cache(city_data[0], city_data[1], output)
     data_template = to_display(city_data[0], city_data[1])
     return render_template("data.html", data=data_template)
