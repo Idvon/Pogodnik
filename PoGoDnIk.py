@@ -21,7 +21,10 @@ def get_cache(name: str, time_out: int) -> Any:
     if FILE_DB.is_file():
         local_weather_provider = create_local_weather_provider(FILE_DB, name)
         try:
-            weather_cache, geo_cache = local_weather_provider.weather_data()  # retrieve city cache data
+            (
+                weather_cache,
+                geo_cache,
+            ) = local_weather_provider.weather_data()  # retrieve city cache data
             if (current_time - weather_cache.datetime) <= delta:
                 return weather_cache, geo_cache
         except ProviderNoDataError:
@@ -32,7 +35,6 @@ async def to_cache(
     weather_data: WeatherData, geo_data: GeoData, output_file: Path
 ) -> None:
     async with asyncio.TaskGroup() as tg:
-
         # initialize output to a file
         to_out_file = tg.create_task(
             create_output_format(weather_data, geo_data, output_file)
