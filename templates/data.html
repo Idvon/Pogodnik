@@ -7,6 +7,20 @@
             color: white;
             }
         </style>
+        <style>
+            .button-class {
+            background-color: #21C5DD;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            }
+        </style>
     </head>
     <body bgcolor="black">
         <p class="text">
@@ -18,5 +32,32 @@
                 {% endif %}
             {% endfor %}
         </p>
+        <a href="/" class="button-class">
+           return
+        </a>
     </body>
+    <div
+        id="openweathermap-widget-1">
+    </div>
+    <script
+        src='//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/d3.min.js'>
+    </script>
+    <script>
+        window.myWidgetParam ? window.myWidgetParam : window.myWidgetParam = [];
+        window.myWidgetParam.push({
+        id: 1,
+        cityid: '498817',
+        appid: '252c0a626504cf325628c1eb38fb6611',
+        units: 'metric',
+        containerid: 'openweathermap-widget-1',
+        });
+        (function() {
+        var script = document.createElement('script');
+        script.async = true;
+        script.charset = "utf-8";
+        script.src = "//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/weather-widget-generator.js";
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(script, s);
+        })();
+    </script>
 </html>>
