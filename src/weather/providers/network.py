@@ -35,24 +35,23 @@ class OpenMeteoWeatherProvider(WeatherProvider):
         self.payload = {
             "latitude": coords.lat,
             "longitude": coords.lon,
-            "current_weather": "true",
-            "windspeed_unit": "ms",
-            "hourly": "relativehumidity_2m",
+            "current": "relative_humidity_2m,"
+                       "temperature_2m,"
+                       "wind_speed_10m,"
+                       "wind_direction_10m,",
+            "wind_speed_unit": "ms",
         }
         self.url = "https://api.open-meteo.com/v1/forecast"
 
     def weather_data(self, response):
-        current_time = response["current_weather"]["time"]
-        list_time = response["hourly"]["time"]
-        index_humidity = list_time.index(current_time)
         return WeatherData(
             datetime.now(timezone.utc),
             "openmeteo",
-            response["current_weather"]["temperature"],
-            response["hourly"]["relativehumidity_2m"][index_humidity],
-            direction(int(response["current_weather"]["winddirection"])),
-            int(response["current_weather"]["winddirection"]),
-            response["current_weather"]["windspeed"],
+            response["current"]["temperature_2m"],
+            response["current"]["relative_humidity_2m"],
+            direction(int(response["current"]["wind_direction_10m"])),
+            int(response["current"]["wind_direction_10m"]),
+            response["current"]["wind_speed_10m"],
         )
 
 

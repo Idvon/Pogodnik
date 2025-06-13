@@ -49,8 +49,13 @@ async def response(city):
 async def data(num, city):
     output = Path("out.csv")
     weather_config = get_config().get_weather_config()
+    weather_provider = get_config().get_weather_config().provider
     geo_config = get_config().get_geo_config()
     city_data = await main(geo_config, weather_config, city, num - 1)
     await to_cache(city_data[0], city_data[1], output)
     data_template = to_display(city_data[0], city_data[1])
-    return render_template("data.html", data=data_template)
+    match weather_provider:
+        case "openweather":
+            return render_template("data_ow.html", data=data_template)
+        case "openmeteo":
+            return render_template("data_om.html", data=data_template)
