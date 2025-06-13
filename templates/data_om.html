@@ -1,0 +1,39 @@
+<html lang="en">
+    <head>
+        <title>FlaskApp</title>
+        <style>
+            .text{
+            font-family: "Comic Sans", sans-serif;
+            color: white;
+            }
+        </style>
+        <style>
+            .button-class {
+            background-color: #21C5DD;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            }
+        </style>
+    </head>
+    <body bgcolor="black">
+        <p class="text">
+            {% set data = data.split('\n') %}
+            {% for item in data %}
+            {{ item }}
+                {% if not loop.last %}
+                 <br/>
+                {% endif %}
+            {% endfor %}
+        </p>
+        <a href="/" class="button-class">
+           return
+        </a>
+    </body>
+</html>>
