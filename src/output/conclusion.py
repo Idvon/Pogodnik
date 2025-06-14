@@ -68,7 +68,7 @@ class DatabaseWriter(CityData):
 WRITER = {".csv": CSVFileWriter, ".sqlite3": DatabaseWriter}
 
 
-async def create_output_format(
+def create_output_format(
     weather_data: WeatherData, geo_data: GeoData, file_out: Path
 ) -> CityData:
     form = file_out.suffix

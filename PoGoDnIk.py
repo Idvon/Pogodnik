@@ -1,5 +1,4 @@
 import argparse
-import asyncio
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Tuple
@@ -31,26 +30,22 @@ def get_cache(name: str, time_out: int) -> Any:
             pass
 
 
-async def to_cache(
+def to_cache(
     weather_data: WeatherData, geo_data: GeoData, output_file: Path
 ) -> None:
-    async with asyncio.TaskGroup() as tg:
-        # initialize output to a file
-        to_out_file = tg.create_task(
-            create_output_format(weather_data, geo_data, output_file)
-        )
-        task = await to_out_file
-        task.city_outputs()
 
-        # initialize output to a db
-        to_db_file = tg.create_task(
-            create_output_format(weather_data, geo_data, FILE_DB)
-        )
-        task2 = await to_db_file
-        task2.city_outputs()
+    # initialize output to a file
+    create_output_format(
+        weather_data, geo_data, output_file
+    ).city_outputs()
+
+    # initialize output to a db
+    create_output_format(
+        weather_data, geo_data, FILE_DB
+    ).city_outputs()
 
 
-async def main(
+def main(
     config_geo: GeoConfig,
     config_weather: WeatherConfig,
     name_city: str,
@@ -93,7 +88,7 @@ if __name__ == "__main__":
     if cache:
         city_data = cache
     else:
-        city_data = asyncio.run(main(geo_config, weather_config, city_name, 0))
-        asyncio.run(to_cache(city_data[0], city_data[1], output))
+        city_data = main(geo_config, weather_config, city_name, 0)
+        to_cache(city_data[0], city_data[1], output)
 
     print(to_display(city_data[0], city_data[1]))
