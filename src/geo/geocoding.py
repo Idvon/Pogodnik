@@ -1,5 +1,5 @@
 import abc
-from typing import Dict, List, Union, Optional
+from typing import Dict, Union, Optional
 
 from requests import get
 
@@ -13,11 +13,10 @@ class GeoProvider:
     payload: dict
 
     @abc.abstractmethod
-    def request(self) -> Optional[dict]:
+    def request(self) -> None:
         """
         Request geo data and return response
         """
-        return self.response
 
     def get_coords(self) -> Coords:  # extraction of coordinates from the geo provider's response
         return Coords(self.response["lat"], self.response["lon"])
@@ -39,7 +38,7 @@ class OpenWeatherGeoProvider(GeoProvider):
         }
         self.url = "https://api.openweathermap.org/geo/1.0/direct"
 
-    def request(self) -> Optional[dict]:
+    def request(self):
         self.response: list = get(self.url, params=self.payload).json()
         match self.response:
             case []:
@@ -49,7 +48,6 @@ class OpenWeatherGeoProvider(GeoProvider):
             case {"cod": 401, **args}:
                 raise ProviderNoDataError("Please, check geo API key")
         self.response = self.response[0]
-        return self.response
 
 
 PROVIDERS = {"openweather": OpenWeatherGeoProvider}

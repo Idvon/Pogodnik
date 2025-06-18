@@ -12,7 +12,7 @@ class DBWeatherProvider(WeatherProvider):
         self.file = file
         self.city = city
 
-    def weather_data(self, _=None):
+    def weather_data(self):
         try:
             sqlite_connection = sqlite3.connect(self.file)
             cursor = sqlite_connection.cursor()

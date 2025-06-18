@@ -58,9 +58,8 @@ def main(
     net_weather_provider = create_net_weather_provider(  # initializing the weather data
         config_weather, coords
     )
-    weather_data = net_weather_provider.weather_data(  # of the net provider
-        net_weather_provider.request()
-    )
+    net_weather_provider.request()
+    weather_data = net_weather_provider.weather_data()  # of the net provider
     return weather_data, geo_data  # initialize output city data
 
 
