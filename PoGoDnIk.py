@@ -49,10 +49,9 @@ def main(
     config_geo: GeoConfig,
     config_weather: WeatherConfig,
     name_city: str,
-    num: int,
 ) -> Tuple[WeatherData, GeoData]:
     geo_provider = create_geo_provider(config_geo, name_city)
-    geo_provider.response = geo_provider.request()[num]
+    geo_provider.request()
     coords = geo_provider.get_coords()
     geo_data = geo_provider.get_city_data()  # initializing the geo data
 
@@ -88,7 +87,7 @@ if __name__ == "__main__":
     if cache:
         city_data = cache
     else:
-        city_data = main(geo_config, weather_config, city_name, 0)
+        city_data = main(geo_config, weather_config, city_name)
         to_cache(city_data[0], city_data[1], output)
 
     print(to_display(city_data[0], city_data[1]))

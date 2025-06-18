@@ -24,10 +24,10 @@ class ConfigFileParser:
             self.config["weather_provider"]["api_key"],
         )
 
-    def get_timeout(self) -> int:
+    def get_timeout(self) -> int:  # obtaining a time-out between weather queries
         return self.config["timeout"]
 
-    def get_city_name(self) -> str:
+    def get_city_name(self) -> str:  # obtaining a city name
         return self.config["city_name"]
 
 

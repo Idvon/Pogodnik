@@ -19,7 +19,7 @@ def get_config():
 
 
 @APP.route("/", methods=["GET", "POST"])
-async def web_conclusion():
+def web_conclusion():
     if request.method == "POST":
         city_name = request.form["city_name"]
         return redirect(url_for("response", city=city_name))
@@ -27,7 +27,7 @@ async def web_conclusion():
 
 
 @APP.route("/response/<city>")
-async def response(city):
+def response(city):
     geo_config = get_config().get_geo_config()
     timeout = get_config().get_timeout()
     cache = get_cache(city, timeout)
@@ -46,11 +46,11 @@ async def response(city):
 
 
 @APP.route("/data/<int:num>/<city>")
-async def data(num, city):
+def data(num, city):
     output = Path("out.csv")
     weather_config = get_config().get_weather_config()
     geo_config = get_config().get_geo_config()
-    city_data = await main(geo_config, weather_config, city, num - 1)
-    await to_cache(city_data[0], city_data[1], output)
+    city_data = main(geo_config, weather_config, city, num - 1)
+    to_cache(city_data[0], city_data[1], output)
     data_template = to_display(city_data[0], city_data[1])
     return render_template("data.html", data=data_template)
