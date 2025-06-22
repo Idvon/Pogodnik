@@ -86,5 +86,5 @@ def to_display(weather_data: WeatherData, geo_data: GeoData) -> str:
         f"Humidity: {weather_data.hum} %\n"
         f"Wind speed: {weather_data.windspeed} m/s\n"
         f"Wind direction: {weather_data.winddir}\n"
-        f"By {weather_data.provider}"
+        f"By {weather_data.provider}\n"
     )
