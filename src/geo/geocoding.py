@@ -1,4 +1,5 @@
 import abc
+import aiohttp
 from typing import Dict, Union, Optional
 
 from requests import get
@@ -13,7 +14,7 @@ class GeoProvider:
     payload: dict
 
     @abc.abstractmethod
-    def request(self) -> None:
+    def request(self, *args) -> None:
         """
         Request geo data and return response
         """
@@ -38,16 +39,17 @@ class OpenWeatherGeoProvider(GeoProvider):
         }
         self.url = "https://api.openweathermap.org/geo/1.0/direct"
 
-    def request(self):
-        self.response: list = get(self.url, params=self.payload).json()
-        match self.response:
-            case []:
-                raise ProviderNoDataError(
-                    "This city is not found. Please, check city name"
-                )
-            case {"cod": 401, **args}:
-                raise ProviderNoDataError("Please, check geo API key")
-        self.response = self.response[0]
+    async def request(self, session: aiohttp.ClientSession):
+        async with session.get(self.url, params=self.payload) as response:
+            self.response: list = await response.json()
+            match self.response:
+                case []:
+                    raise ProviderNoDataError(
+                        "This city is not found. Please, check city name"
+                    )
+                case {"cod": 401, **args}:
+                    raise ProviderNoDataError("Please, check geo API key")
+            self.response = self.response[0]
 
 
 PROVIDERS = {"openweather": OpenWeatherGeoProvider}
