@@ -59,15 +59,15 @@ async def main(
         # initializing the geo data
         geo_provider = create_geo_provider(config_geo, name_city)
         await geo_provider.request(session)
-    coords = geo_provider.get_coords()
-    geo_data = geo_provider.get_city_data()
+        coords = geo_provider.get_coords()
+        geo_data = geo_provider.get_city_data()
 
-    # initializing the weather data
-    net_weather_provider = create_net_weather_provider(
-        config_weather, coords
-    )
-    net_weather_provider.request()
-    weather_data = net_weather_provider.weather_data()
+        # initializing the weather data
+        net_weather_provider = create_net_weather_provider(
+            config_weather, coords
+        )
+        await net_weather_provider.request(session)
+        weather_data = net_weather_provider.weather_data()
 
     return weather_data, geo_data  # initialize output city data
 
@@ -114,8 +114,8 @@ if __name__ == "__main__":
         #call_cities.append(city)
     #print(call_cities)
     cities_data = asyncio.run(asyn(geo_config, weather_config, cities))
-    #print(cities_data)
-    [to_cache(city_data[0], city_data[1], output) for city_data in cities_data]
+    #print(type(cities_data))
+    #[to_cache(city_data[0], city_data[1], output) for city_data in cities_data]
     print('\n'.join([to_display(city_data[0], city_data[1]) for city_data in cities_data]))
     #print(city_data)
         #print(to_display(city_data[0], city_data[1]))

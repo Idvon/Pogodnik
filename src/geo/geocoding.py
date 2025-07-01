@@ -2,8 +2,6 @@ import abc
 import aiohttp
 from typing import Dict, Union, Optional
 
-from requests import get
-
 from src.exceptions import ProviderCreationError, ProviderNoDataError
 from src.structures import Coords, GeoConfig, GeoData
 
@@ -14,7 +12,7 @@ class GeoProvider:
     payload: dict
 
     @abc.abstractmethod
-    def request(self, *args) -> None:
+    async def request(self, session: aiohttp.ClientSession) -> None:
         """
         Request geo data and return response
         """
