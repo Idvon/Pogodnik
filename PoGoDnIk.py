@@ -54,18 +54,11 @@ async def async_exec(
     list_city: List[str],
     time_out: int,
     output_file: Path
-) -> list:
-    tasks = []
-    results = []
+) -> List[Tuple[WeatherData, GeoData]]:
     async with asyncio.TaskGroup() as tg:
-        for city in list_city:
-            tasks.append(tg.create_task(main(config_geo, config_weather, city, time_out, output_file)))
-    async for task in asyncio.as_completed(tasks):
-        results.append(await task)
-        #results = asyncio.as_completed(tasks)
-        #task.add_done_callback(tasks.discard)
-    #print(tasks)
-
+        tasks = [tg.create_task(main(config_geo, config_weather, city, time_out, output_file)) for city in list_city]
+    results = [await asyncio.wait_for(task, timeout=None) for task in tasks]
+    #results = await asyncio.gather(*tasks)
     return results
 
 
