@@ -6,7 +6,7 @@ from src.exceptions import ProviderCreationError, ProviderNoDataError
 from src.structures import Coords, GeoConfig, GeoData
 
 
-class GeoProvider:
+class GeoProvider(abc.ABC):
     response: Optional[dict]
     url: str
     payload: dict

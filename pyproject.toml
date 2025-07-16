@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "PoGoDnIk"
-version = "0.1.0"
+version = "1.0.1"
 description = ""
 authors = ["Idvon <d.suchanow2010@yandex.ru>"]
 
@@ -11,6 +11,8 @@ requests = "2.29.0"
 flask = "2.3.2"
 asyncio = "3.4.3"
 aiohttp = "3.12.13"
+aiofile = "3.9.0"
+aiosqlite = "0.21.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "1.2.0"

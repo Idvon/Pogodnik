@@ -4,7 +4,7 @@ import asyncio
 import aiohttp
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Tuple, Optional, Union, List
+from typing import Any, Tuple, Optional, Union, List, Coroutine, Set
 
 from src.config_file_parser.file_parser import create_parser
 from src.exceptions import ProviderNoDataError
@@ -17,7 +17,7 @@ from src.weather.providers.network import create_net_weather_provider
 FILE_DB = Path("db.sqlite3")
 
 
-def get_cache(name: str, time_out: int) -> Optional[Tuple[WeatherData, GeoData]]:
+async def get_cache(name: str, time_out: int) -> Optional[Tuple[WeatherData, GeoData]]:
     delta = timedelta(minutes=time_out)
     current_time = datetime.now(timezone.utc)
     if FILE_DB.is_file():
@@ -33,7 +33,7 @@ def get_cache(name: str, time_out: int) -> Optional[Tuple[WeatherData, GeoData]]
             pass
 
 
-def to_cache(
+async def to_cache(
     weather_data: WeatherData, geo_data: GeoData, output_file: Path
 ) -> None:
 
@@ -56,38 +56,43 @@ async def async_exec(
     output_file: Path
 ) -> List[Tuple[WeatherData, GeoData]]:
     async with asyncio.TaskGroup() as tg:
-        tasks = [tg.create_task(main(config_geo, config_weather, city, time_out, output_file)) for city in list_city]
-    results = [await asyncio.wait_for(task, timeout=None) for task in tasks]
-    #results = await asyncio.gather(*tasks)
+        caching = []
+        cache_tasks = [tg.create_task(get_cache(city, time_out)) for city in list_city]
+        tasks = [await asyncio.wait_for(task, timeout=None) for task in cache_tasks]
+        i = 0
+        for city in list_city:
+            if tasks[i] is None:
+                tasks[i] = tg.create_task(main(config_geo, config_weather, city))
+                caching.append(tasks[i])
+            else:
+                pass
+            i += 1
+    cache = [await asyncio.wait_for(task, timeout=None) for task in caching]
+    [await to_cache(weather_data, geo_data, output_file) for weather_data, geo_data in cache]
+    results = [await asyncio.wait_for(task, timeout=None) if type(task) is asyncio.Task else task for task in tasks]
     return results
 
 
 async def main(
     config_geo: GeoConfig,
     config_weather: WeatherConfig,
-    name_city: str,
-    time_out: int,
-    output_file: Path
+    name_city: str
 ) -> Tuple[WeatherData, GeoData]:
-    cache = get_cache(name_city, time_out)
-    if cache:
-        weather_data, geo_data = cache
-    else:
-        async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession() as session:
 
-            # initializing the geo data
-            geo_provider = create_geo_provider(config_geo, name_city)
-            await geo_provider.request(session)
-            coords = geo_provider.get_coords()
-            geo_data = geo_provider.get_city_data()
+        # initializing the geo data
+        geo_provider = create_geo_provider(config_geo, name_city)
+        await geo_provider.request(session)
+        coords = geo_provider.get_coords()
+        geo_data = geo_provider.get_city_data()
 
-            # initializing the weather data
-            net_weather_provider = create_net_weather_provider(
-                config_weather, coords
-            )
-            await net_weather_provider.request(session)
-            weather_data = net_weather_provider.weather_data()
-        to_cache(weather_data, geo_data, output_file)
+        # initializing the weather data
+        net_weather_provider = create_net_weather_provider(
+            config_weather, coords
+        )
+        await net_weather_provider.request(session)
+        weather_data = net_weather_provider.weather_data()
+        #to_cache(weather_data, geo_data, output_file)
     return weather_data, geo_data  # initialize output city data
 
 
@@ -110,21 +115,8 @@ if __name__ == "__main__":
     cities = config_parser.get_city()
     if type(cities) is not list:
         cities = [cities]
-
-    # retrieve data from the local cache
-    #cache = get_cache(cities, timeout)
-    #if cache:
-        #city_data = cache
-    #else:
-        #call_cities.append(city)
-    #print(call_cities)
-
     cities_data = asyncio.run(async_exec(geo_config, weather_config, cities, timeout, output))
-    #print(type(cities_data))
-    #[to_cache(city_data[0], city_data[1], output) for city_data in cities_data]
     print('\n'.join([to_display(city_data[0], city_data[1]) for city_data in cities_data]))
-    #print(city_data)
-        #print(to_display(city_data[0], city_data[1]))
 
     print(time.monotonic() - s_t)
     """
