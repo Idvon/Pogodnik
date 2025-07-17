@@ -1,6 +1,8 @@
 import abc
-import csv
-import sqlite3
+
+import aiosqlite
+from csv import writer
+from aiofile import async_open
 from pathlib import Path
 
 from src.exceptions import ProviderCreationError
@@ -14,7 +16,7 @@ class CityData(abc.ABC):
         self.file_out = file_out
 
     @abc.abstractmethod
-    def city_outputs(self) -> dict:
+    async def city_outputs(self) -> dict:
         """
         Data retrieval and output in different file formats
         """
@@ -22,47 +24,45 @@ class CityData(abc.ABC):
 
 
 class CSVFileWriter(CityData):
-    def city_outputs(self):
+    async def city_outputs(self):
         headers = self.weather_data._fields + self.geo_data._fields
+        values = *self.weather_data, *self.geo_data
         headers = None if self.file_out.is_file() else headers
-        with open(self.file_out, "a", newline="") as f:
-            writer = csv.writer(f)
+        async with async_open(self.file_out, "a") as f:
             if headers is not None:
-                writer.writerow(headers)
-            values = *self.weather_data, *self.geo_data
-            writer.writerow(values)
+                await writer(f).writerow(headers)
+            await writer(f).writerow(values)
 
 
 class DatabaseWriter(CityData):
-    def city_outputs(self):
+    async def city_outputs(self):
         values = *self.weather_data, *self.geo_data
         try:
-            sqlite_connection = sqlite3.connect(self.file_out)
-            headers = """
-                CREATE TABLE IF NOT EXISTS weather_results (
-                datetime date,
-                provider text,
-                temp real,
-                hum integer,
-                winddir text,
-                winddeg integer,
-                windspeed real,
-                city text,
-                country text,
-                state text)
-                """
-            cursor = sqlite_connection.cursor()
-            cursor.execute(headers)
-            cursor.execute(
-                "INSERT INTO weather_results VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                values,
-            )
-            sqlite_connection.commit()
-            cursor.close()
-        except sqlite3.Error as error:
+            async with aiosqlite.connect(self.file_out) as db:
+                headers = """
+                    CREATE TABLE IF NOT EXISTS weather_results (
+                    datetime date,
+                    provider text,
+                    temp real,
+                    hum integer,
+                    winddir text,
+                    winddeg integer,
+                    windspeed real,
+                    city text,
+                    country text,
+                    state text)
+                    """
+                async with db.execute(headers) as cursor:
+                    await cursor.execute(
+                        "INSERT INTO weather_results VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        values,
+                    )
+                await db.commit()
+                await cursor.close()
+        except aiosqlite.Error as error:
             print(f"Error connecting to DB {error}")
         finally:
-            sqlite_connection.close()
+            await db.close()
 
 
 WRITER = {".csv": CSVFileWriter, ".sqlite3": DatabaseWriter}

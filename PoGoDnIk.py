@@ -38,14 +38,15 @@ async def to_cache(
 ) -> None:
 
     # initialize output to a file
-    create_output_format(
+    await create_output_format(
         weather_data, geo_data, output_file
     ).city_outputs()
-
+    print("csv", time.monotonic())
     # initialize output to a db
-    create_output_format(
+    await create_output_format(
         weather_data, geo_data, FILE_DB
     ).city_outputs()
+    print("db", time.monotonic())
 
 
 async def async_exec(
@@ -100,7 +101,7 @@ if __name__ == "__main__":
     s_t = time.monotonic()
     parser = argparse.ArgumentParser(description="Weather by config file")
     parser.add_argument("--config", type=str)
-    parser.add_argument("--output", type=str)
+    parser.add_argument("--output", type=str)   # add optional flag
     args = parser.parse_args()
     config = Path(args.config)
     output = Path(args.output)
@@ -116,8 +117,9 @@ if __name__ == "__main__":
     if type(cities) is not list:
         cities = [cities]
     cities_data = asyncio.run(async_exec(geo_config, weather_config, cities, timeout, output))
-    print('\n'.join([to_display(city_data[0], city_data[1]) for city_data in cities_data]))
+    #print('\n'.join([to_display(city_data[0], city_data[1]) for city_data in cities_data]))
 
+    print(s_t)
     print(time.monotonic() - s_t)
     """
     sequential processing of a single city took 0.8...1.0 sec
