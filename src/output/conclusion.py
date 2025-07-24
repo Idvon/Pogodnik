@@ -1,8 +1,8 @@
 import abc
-
+import asyncio
 import aiosqlite
-from csv import writer
-from aiofile import async_open
+import aiocsv
+import aiofiles
 from pathlib import Path
 
 from src.exceptions import ProviderCreationError
@@ -27,11 +27,17 @@ class CSVFileWriter(CityData):
     async def city_outputs(self):
         headers = self.weather_data._fields + self.geo_data._fields
         values = *self.weather_data, *self.geo_data
-        headers = None if self.file_out.is_file() else headers
-        async with async_open(self.file_out, "a") as f:
-            if headers is not None:
-                await writer(f).writerow(headers)
-            await writer(f).writerow(values)
+        async with aiofiles.open(self.file_out, "w+", newline="") as f:
+            reader = aiocsv.AsyncDictReader(f, headers)
+            writer = aiocsv.AsyncDictWriter(f, headers)
+            if await reader.get_fieldnames() == headers:
+                await writer.writerow(headers)
+            #await f.flush()
+        async with aiofiles.open(self.file_out, "a", newline="") as f:
+            await f.flush()
+            writer = aiocsv.AsyncWriter(f)
+            await writer.writerow(values)
+            #await f.close()
 
 
 class DatabaseWriter(CityData):

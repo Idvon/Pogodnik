@@ -31,6 +31,7 @@ async def get_cache(name: str, time_out: int) -> Optional[Tuple[WeatherData, Geo
                 return weather_cache, geo_cache
         except ProviderNoDataError:
             pass
+    print("getcach", time.monotonic())
 
 
 async def to_cache(
@@ -68,8 +69,9 @@ async def async_exec(
             else:
                 pass
             i += 1
-    cache = [await asyncio.wait_for(task, timeout=None) for task in caching]
-    [await to_cache(weather_data, geo_data, output_file) for weather_data, geo_data in cache]
+        cache = [await asyncio.wait_for(task, timeout=None) for task in caching]
+        task_caching = [tg.create_task(to_cache(weather_data, geo_data, output_file)) for weather_data, geo_data in cache]
+    [await asyncio.wait_for(task, timeout=None) for task in task_caching]
     results = [await asyncio.wait_for(task, timeout=None) if type(task) is asyncio.Task else task for task in tasks]
     return results
 
@@ -79,21 +81,20 @@ async def main(
     config_weather: WeatherConfig,
     name_city: str
 ) -> Tuple[WeatherData, GeoData]:
-    async with aiohttp.ClientSession() as session:
 
-        # initializing the geo data
-        geo_provider = create_geo_provider(config_geo, name_city)
-        await geo_provider.request(session)
-        coords = geo_provider.get_coords()
-        geo_data = geo_provider.get_city_data()
+    # initializing the geo data
+    geo_provider = create_geo_provider(config_geo, name_city)
+    await geo_provider.request()
+    coords = geo_provider.get_coords()
+    geo_data = geo_provider.get_city_data()
 
-        # initializing the weather data
-        net_weather_provider = create_net_weather_provider(
-            config_weather, coords
-        )
-        await net_weather_provider.request(session)
-        weather_data = net_weather_provider.weather_data()
-        #to_cache(weather_data, geo_data, output_file)
+    # initializing the weather data
+    net_weather_provider = create_net_weather_provider(
+        config_weather, coords
+    )
+    await net_weather_provider.request()
+    weather_data = net_weather_provider.weather_data()
+    #to_cache(weather_data, geo_data, output_file)
     return weather_data, geo_data  # initialize output city data
 
 

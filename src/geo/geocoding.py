@@ -11,11 +11,10 @@ class GeoProvider(abc.ABC):
     url: str
     payload: dict
 
-    @abc.abstractmethod
-    async def request(self, session: aiohttp.ClientSession) -> None:
-        """
-        Request geo data and return response
-        """
+    async def request(self) -> None:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(self.url, params=self.payload) as response:
+                self.response = await response.json()
 
     def get_coords(self) -> Coords:  # extraction of coordinates from the geo provider's response
         return Coords(self.response["lat"], self.response["lon"])
@@ -37,17 +36,16 @@ class OpenWeatherGeoProvider(GeoProvider):
         }
         self.url = "https://api.openweathermap.org/geo/1.0/direct"
 
-    async def request(self, session: aiohttp.ClientSession):
-        async with session.get(self.url, params=self.payload) as response:
-            self.response: list = await response.json()
-            match self.response:
-                case []:
-                    raise ProviderNoDataError(
-                        "This city is not found. Please, check city name"
-                    )
-                case {"cod": 401, **args}:
-                    raise ProviderNoDataError("Please, check geo API key")
-            self.response = self.response[0]
+    async def request(self):
+        await super().request()
+        match self.response:
+            case []:
+                raise ProviderNoDataError(
+                    "This city is not found. Please, check city name"
+                )
+            case {"cod": 401, **args}:
+                raise ProviderNoDataError("Please, check geo API key")
+        self.response = self.response[0]
 
 
 PROVIDERS = {"openweather": OpenWeatherGeoProvider}

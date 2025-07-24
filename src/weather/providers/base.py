@@ -10,9 +10,10 @@ class WeatherProvider(abc.ABC):
     url: str
     payload: dict
 
-    async def request(self, session: aiohttp.ClientSession) -> None:
-        async with session.get(self.url, params=self.payload) as response:
-            self.response = await response.json()
+    async def request(self) -> None:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(self.url, params=self.payload) as response:
+                self.response = await response.json()
 
     @abc.abstractmethod
     def weather_data(self) -> WeatherData:
