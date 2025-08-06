@@ -21,7 +21,7 @@ def test_geocoding_parser():
         requests.get(OW_GEO_URL).json()
         provider = OpenWeatherGeoProvider(GEO_CONFIG, LOCAL_CITY)
         provider.response = GEOCODING_RESPONSE[0]
-        assert provider.get_city_data() == GEO_DATA
+        assert provider.geo_data() == GEO_DATA
     assert provider.get_coords() == COORDS
 
 

@@ -1,6 +1,6 @@
 import abc
 import aiohttp
-from typing import Optional, Coroutine
+from typing import Optional
 
 from src.structures import WeatherData
 

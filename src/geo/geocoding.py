@@ -19,7 +19,7 @@ class GeoProvider(abc.ABC):
     def get_coords(self) -> Coords:  # extraction of coordinates from the geo provider's response
         return Coords(self.response["lat"], self.response["lon"])
 
-    def get_city_data(self) -> GeoData:  # extraction of city name and city country from the geo provider's response
+    def geo_data(self) -> GeoData:  # extraction of city name and city country from the geo provider's response
         return GeoData(
             self.response["name"],
             self.response["country"],

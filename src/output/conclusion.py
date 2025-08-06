@@ -1,5 +1,4 @@
 import abc
-import asyncio
 import aiosqlite
 import aiocsv
 import aiofiles
@@ -7,7 +6,7 @@ from pathlib import Path
 from typing import List
 
 from src.exceptions import ProviderCreationError
-from src.structures import GeoData, WeatherData, CityData
+from src.structures import CityData
 
 
 class RecordCityData(abc.ABC):
@@ -39,7 +38,7 @@ class CSVFileWriter(RecordCityData):
 
 class DatabaseWriter(RecordCityData):
     async def city_outputs(self):
-        values = *self.weather_data, *self.geo_data
+        values = [(*self.city_data[i].weather_data, *self.city_data[i].geo_data) for i in range(len(self.city_data))]
         try:
             async with aiosqlite.connect(self.file_out) as db:
                 headers = """
@@ -56,7 +55,7 @@ class DatabaseWriter(RecordCityData):
                     state text)
                     """
                 async with db.execute(headers) as cursor:
-                    await cursor.execute(
+                    await cursor.executemany(
                         "INSERT INTO weather_results VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         values,
                     )
