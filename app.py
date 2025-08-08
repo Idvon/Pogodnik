@@ -8,7 +8,7 @@ from src.geo.geocoding import create_geo_provider
 from src.output.conclusion import to_display
 
 APP = Flask(__name__)
-CONFIG = Path("config.json")
+CONFIG = Path("c.json")
 
 
 def get_config():
@@ -22,35 +22,38 @@ def get_config():
 def web_conclusion():
     if request.method == "POST":
         city_name = request.form["city_name"]
-        return redirect(url_for("response", city=city_name))
+        return redirect(url_for("response", city_name=city_name))
     return render_template("index.html")
 
 
-@APP.route("/response/<city>")
-def response(city):
+@APP.route("/response/<city_name>")
+async def response(city_name):
     geo_config = get_config().get_geo_config()
     timeout = get_config().get_timeout()
-    cache = get_cache(city, timeout)
-    if cache:
-        cdata = to_display(cache[0], cache[1])
+    city_name = [city_name]
+    cache = get_cache(city_name, timeout)
+    if type(cache[0]) is not str:
+        cdata = to_display(cache[0])
         return render_template("data.html", data=cdata)
     else:
-        geo_provider = create_geo_provider(geo_config, city)
-        city_list = geo_provider.request()
+        geo_provider = create_geo_provider(geo_config, city_name[0])
+        await geo_provider.request()
+        city_list = geo_provider.response
         town_list = dict()
         for elem in city_list:
             town_list[
                 city_list.index(elem) + 1
             ] = f"name: {elem['name']}, country: {elem['country']}, state: {elem['state']}"
-        return render_template("response.html", city_list=town_list, city=city)
+        return render_template("response.html", city_list=town_list, city_name=city_name[0])
 
 
-@APP.route("/data/<int:num>/<city>")
-def data(num, city):
-    output = Path("out.csv")
+@APP.route("/data/<int:num>/<city_name>")
+async def data(num: int, city_name: str):
+    city_name = [city_name]
+    output = Path("o.csv")
     weather_config = get_config().get_weather_config()
     geo_config = get_config().get_geo_config()
-    city_data = main(geo_config, weather_config, city, num - 1)
-    to_cache(city_data[0], city_data[1], output)
-    data_template = to_display(city_data[0], city_data[1])
+    city_data, cache_data = await main(geo_config, weather_config, city_name, num - 1)
+    await to_cache(cache_data, output)
+    data_template = to_display(city_data[0])
     return render_template("data.html", data=data_template)

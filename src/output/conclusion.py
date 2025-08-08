@@ -79,17 +79,14 @@ def create_output_format(
     raise ProviderCreationError("No local provider available")
 
 
-def to_display(city_data: List[CityData]) -> List[str]:
-    text = []
-    for data in city_data:
-        text.append(
-            f"Weather in {data.geo_data.city}\n"
-            f"Country: {data.geo_data.country}\n"
-            f"State: {data.geo_data.state}\n"
-            f"Temperature: {data.weather_data.temp} \N{degree sign}C\n"
-            f"Humidity: {data.weather_data.hum} %\n"
-            f"Wind speed: {data.weather_data.windspeed} m/s\n"
-            f"Wind direction: {data.weather_data.winddir}\n"
-            f"By {data.weather_data.provider}\n"
-        )
-    return text
+def to_display(city_data: CityData) -> str:
+    return (
+        f"Weather in {city_data.geo_data.city}\n"
+        f"Country: {city_data.geo_data.country}\n"
+        f"State: {city_data.geo_data.state}\n"
+        f"Temperature: {city_data.weather_data.temp} \N{degree sign}C\n"
+        f"Humidity: {city_data.weather_data.hum} %\n"
+        f"Wind speed: {city_data.weather_data.windspeed} m/s\n"
+        f"Wind direction: {city_data.weather_data.winddir}\n"
+        f"By {city_data.weather_data.provider}\n"
+    )

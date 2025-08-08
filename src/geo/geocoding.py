@@ -1,13 +1,14 @@
 import abc
 import aiohttp
-from typing import Dict, Union, Optional
+from typing import Dict, Union, Optional, List
 
 from src.exceptions import ProviderCreationError, ProviderNoDataError
 from src.structures import Coords, GeoConfig, GeoData
 
 
 class GeoProvider(abc.ABC):
-    response: Optional[dict]
+    response: Optional[list]
+    valid_response: dict
     url: str
     payload: dict
 
@@ -17,13 +18,13 @@ class GeoProvider(abc.ABC):
                 self.response = await response.json()
 
     def get_coords(self) -> Coords:  # extraction of coordinates from the geo provider's response
-        return Coords(self.response["lat"], self.response["lon"])
+        return Coords(self.valid_response["lat"], self.valid_response["lon"])
 
     def geo_data(self) -> GeoData:  # extraction of city name and city country from the geo provider's response
         return GeoData(
-            self.response["name"],
-            self.response["country"],
-            self.response.get("state", ""),
+            self.valid_response["name"],
+            self.valid_response["country"],
+            self.valid_response.get("state", ""),
         )
 
 
@@ -45,7 +46,6 @@ class OpenWeatherGeoProvider(GeoProvider):
                 )
             case {"cod": 401, **args}:
                 raise ProviderNoDataError("Please, check geo API key")
-        self.response = self.response[0]
 
 
 PROVIDERS = {"openweather": OpenWeatherGeoProvider}

@@ -13,7 +13,7 @@ class DBWeatherProvider(WeatherProvider):
         self.city = city
         self.timeout = timeout
 
-    def weather_data(self):
+    def weather_data(self) -> CityData:
         delta = timedelta(minutes=self.timeout)
         current_time = datetime.now(timezone.utc)
         try:

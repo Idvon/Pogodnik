@@ -45,12 +45,14 @@ async def to_cache(
 async def network_data(
     config_geo: GeoConfig,
     config_weather: WeatherConfig,
-    name_city: str
+    name_city: str,
+    num: int
 ) -> CityData:
 
     # initializing the geo data
     geo_provider = create_geo_provider(config_geo, name_city)
     await geo_provider.request()
+    geo_provider.valid_response = geo_provider.response[num]
     coords = geo_provider.get_coords()
     geo_data = geo_provider.geo_data()
 
@@ -67,8 +69,8 @@ async def main(
     config_geo: GeoConfig,
     config_weather: WeatherConfig,
     list_city: List[Union[CityData, str]],
-    output_file: Path
-) -> List[CityData]:
+    num: int
+) -> (List[CityData], List[CityData]):
 
     cache = []
     tasks = []
@@ -78,17 +80,16 @@ async def main(
     async with asyncio.TaskGroup() as tg:
         for city in list_city:
             if type(city) is str:
-                city = tg.create_task(network_data(config_geo, config_weather, city))
+                city = tg.create_task(network_data(config_geo, config_weather, city, num))
             tasks.append(city)
 
-    # result task and cache
+    # resulting task
     for task in tasks:
         if type(task) is asyncio.Task:
             task = await asyncio.wait_for(task, timeout=None)
             cache.append(task)
         results.append(task)
-    await to_cache(cache, output_file)
-    return results
+    return results, cache
 
 
 if __name__ == "__main__":
@@ -111,11 +112,11 @@ if __name__ == "__main__":
 
     if type(cities) is not list:  # parser one city name
         cities = [cities]
-    cache_city_data = get_cache(cities, timeout)  # cache and cities name
-    cities_data = asyncio.run(main(geo_config, weather_config, cache_city_data, output))
-    print('\n'.join([data for data in to_display(cities_data)]))  # print to console
+    cache_city_data = get_cache(cities, timeout)  # get cache
+    cities_data, cache_data = asyncio.run(main(geo_config, weather_config, cache_city_data, 0))
+    asyncio.run(to_cache(cache_data, output))
+    print('\n'.join([to_display(data) for data in cities_data]))  # print to console
 
-    print(s_t)
     print(time.monotonic() - s_t)
     """
     sequential processing of a single city took 0.8...1.0 sec
