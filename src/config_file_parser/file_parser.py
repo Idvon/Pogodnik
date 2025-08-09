@@ -8,7 +8,7 @@ from src.exceptions import ProviderCreationError
 from src.structures import GeoConfig, WeatherConfig
 
 
-class ConfigFileParser:
+class ConfigFileParser:  # base class for parsing config files
     config: dict
 
     def get_geo_config(self) -> GeoConfig:  # formation of geo config
@@ -24,10 +24,10 @@ class ConfigFileParser:
             self.config["weather_provider"]["api_key"],
         )
 
-    def get_timeout(self) -> int:  # obtaining a time-out between weather queries
+    def get_timeout(self) -> int:  # obtaining a timeout between weather queries
         return self.config["timeout"]
 
-    def get_city(self) -> Union[List[str], str]:  # obtaining a city name
+    def get_city(self) -> Union[List[str], str]:  # obtaining a list city name or one name
         return self.config["city_name"]
 
 

@@ -1,5 +1,4 @@
 import argparse
-import time
 import asyncio
 from pathlib import Path
 from typing import Union, List
@@ -15,6 +14,7 @@ from src.weather.providers.network import create_net_weather_provider
 FILE_DB = Path("db.sqlite3")
 
 
+# get valid cache from DB file
 def get_cache(city_list: List[str], time_out: int) -> List[Union[CityData, str]]:
     cache = []
     if FILE_DB.is_file():
@@ -27,6 +27,7 @@ def get_cache(city_list: List[str], time_out: int) -> List[Union[CityData, str]]
     return cache
 
 
+# transmission of city data to DB file and output file
 async def to_cache(
     city_data: List[CityData], output_file: Path
 ) -> None:
@@ -42,6 +43,7 @@ async def to_cache(
     ).city_outputs()
 
 
+# get network data one city
 async def network_data(
     config_geo: GeoConfig,
     config_weather: WeatherConfig,
@@ -62,9 +64,10 @@ async def network_data(
     )
     await net_weather_provider.request()
     weather_data = net_weather_provider.weather_data()
-    return CityData(weather_data, geo_data)  # initialize output city data
+    return CityData(weather_data, geo_data)
 
 
+# get city data and cache data all cities
 async def main(
     config_geo: GeoConfig,
     config_weather: WeatherConfig,
@@ -93,10 +96,9 @@ async def main(
 
 
 if __name__ == "__main__":
-    s_t = time.monotonic()
     parser = argparse.ArgumentParser(description="Weather by config file")
     parser.add_argument("--config", type=str)
-    parser.add_argument("--output", type=str)   # add optional flag
+    parser.add_argument("--output", type=str)
     args = parser.parse_args()
     config = Path(args.config)
     output = Path(args.output)
@@ -116,10 +118,3 @@ if __name__ == "__main__":
     cities_data, cache_data = asyncio.run(main(geo_config, weather_config, cache_city_data, 0))
     asyncio.run(to_cache(cache_data, output))
     print('\n'.join([to_display(data) for data in cities_data]))  # print to console
-
-    print(time.monotonic() - s_t)
-    """
-    sequential processing of a single city took 0.8...1.0 sec
-    sequential processing of a cities took (0.9...1.2) * quantity cities sec
-    parallel processing of a cities 0.4...0.8 sec
-    """

@@ -9,7 +9,7 @@ from src.exceptions import ProviderCreationError
 from src.structures import CityData
 
 
-class RecordCityData(abc.ABC):
+class RecordCityData(abc.ABC):  # base class for record city data
     def __init__(self, city_data: List[CityData], file_out: Path):
         self.city_data = city_data
         self.file_out = file_out
@@ -79,7 +79,7 @@ def create_output_format(
     raise ProviderCreationError("No local provider available")
 
 
-def to_display(city_data: CityData) -> str:
+def to_display(city_data: CityData) -> str:  # converting received city data into text strings
     return (
         f"Weather in {city_data.geo_data.city}\n"
         f"Country: {city_data.geo_data.country}\n"

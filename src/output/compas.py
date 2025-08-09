@@ -1,4 +1,4 @@
-def direction(deg: int) -> str:
+def direction(deg: int) -> str:  # converter deg to eight cardinal directions
     if 22.5 <= deg < 67.5:
         return "NE"
     elif 67.5 <= deg < 112.5:

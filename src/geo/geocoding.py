@@ -6,13 +6,13 @@ from src.exceptions import ProviderCreationError, ProviderNoDataError
 from src.structures import Coords, GeoConfig, GeoData
 
 
-class GeoProvider(abc.ABC):
-    response: Optional[list]
+class GeoProvider(abc.ABC):  # base class for network geo providers
+    response: Optional[List[dict]]
     valid_response: dict
     url: str
     payload: dict
 
-    async def request(self) -> None:
+    async def request(self) -> None:  # request and record geo data from a network provider's
         async with aiohttp.ClientSession() as session:
             async with session.get(self.url, params=self.payload) as response:
                 self.response = await response.json()
