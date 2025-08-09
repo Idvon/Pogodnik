@@ -1,6 +1,7 @@
 import abc
+from typing import Dict, List, Optional, Union
+
 import aiohttp
-from typing import Dict, Union, Optional, List
 
 from src.exceptions import ProviderCreationError, ProviderNoDataError
 from src.structures import Coords, GeoConfig, GeoData
@@ -12,15 +13,23 @@ class GeoProvider(abc.ABC):  # base class for network geo providers
     url: str
     payload: dict
 
-    async def request(self) -> None:  # request and record geo data from a network provider's
+    async def request(
+        self,
+    ) -> None:  # request and record geo data from a network provider's
         async with aiohttp.ClientSession() as session:
             async with session.get(self.url, params=self.payload) as response:
                 self.response = await response.json()
 
-    def get_coords(self) -> Coords:  # extraction of coordinates from the geo provider's response
+    def get_coords(
+        self,
+    ) -> Coords:  # extraction of coordinates from the geo provider's response
         return Coords(self.valid_response["lat"], self.valid_response["lon"])
 
-    def geo_data(self) -> GeoData:  # extraction of city name and city country from the geo provider's response
+    def geo_data(
+        self,
+    ) -> (
+        GeoData
+    ):  # extraction of city name and city country from the geo provider's response
         return GeoData(
             self.valid_response["name"],
             self.valid_response["country"],

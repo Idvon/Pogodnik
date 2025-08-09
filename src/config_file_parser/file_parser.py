@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import TextIO, List, Union
+from typing import List, TextIO, Union
 
 import toml
 
@@ -27,7 +27,9 @@ class ConfigFileParser:  # base class for parsing config files
     def get_timeout(self) -> int:  # obtaining a timeout between weather queries
         return self.config["timeout"]
 
-    def get_city(self) -> Union[List[str], str]:  # obtaining a list city name or one name
+    def get_city(
+        self,
+    ) -> Union[List[str], str]:  # obtaining a list city name or one name
         return self.config["city_name"]
 
 

@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from src.exceptions import ProviderCreationError, ProviderNoDataError
-from src.structures import GeoData, WeatherData, CityData
+from src.structures import CityData, GeoData, WeatherData
 from src.weather.providers.base import WeatherProvider
 
 
@@ -64,7 +64,9 @@ class DBWeatherProvider(WeatherProvider):
 LOCAL_PROVIDERS = {".sqlite3": DBWeatherProvider}
 
 
-def create_local_weather_provider(file: Path, city: str, timeout: int) -> DBWeatherProvider:
+def create_local_weather_provider(
+    file: Path, city: str, timeout: int
+) -> DBWeatherProvider:
     provider = file.suffix
     if provider in LOCAL_PROVIDERS.keys():
         return LOCAL_PROVIDERS[provider](file, city, timeout)

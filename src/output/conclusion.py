@@ -1,9 +1,10 @@
 import abc
-import aiosqlite
-import aiocsv
-import aiofiles
 from pathlib import Path
 from typing import List
+
+import aiocsv
+import aiofiles
+import aiosqlite
 
 from src.exceptions import ProviderCreationError
 from src.structures import CityData
@@ -27,8 +28,14 @@ class CSVFileWriter(RecordCityData):
         if self.file_out.is_file():
             headers = None
         else:
-            headers = self.city_data[0].weather_data._fields + self.city_data[0].geo_data._fields
-        values = [(*self.city_data[i].weather_data, *self.city_data[i].geo_data) for i in range(len(self.city_data))]
+            headers = (
+                self.city_data[0].weather_data._fields
+                + self.city_data[0].geo_data._fields
+            )
+        values = [
+            (*self.city_data[i].weather_data, *self.city_data[i].geo_data)
+            for i in range(len(self.city_data))
+        ]
         async with aiofiles.open(self.file_out, "a", newline="") as f:
             writer = aiocsv.AsyncWriter(f)
             if headers is not None:
@@ -38,7 +45,10 @@ class CSVFileWriter(RecordCityData):
 
 class DatabaseWriter(RecordCityData):
     async def city_outputs(self):
-        values = [(*self.city_data[i].weather_data, *self.city_data[i].geo_data) for i in range(len(self.city_data))]
+        values = [
+            (*self.city_data[i].weather_data, *self.city_data[i].geo_data)
+            for i in range(len(self.city_data))
+        ]
         try:
             async with aiosqlite.connect(self.file_out) as db:
                 headers = """
@@ -70,16 +80,16 @@ class DatabaseWriter(RecordCityData):
 WRITER = {".csv": CSVFileWriter, ".sqlite3": DatabaseWriter}
 
 
-def create_output_format(
-    city_data: List[CityData], file_out: Path
-) -> RecordCityData:
+def create_output_format(city_data: List[CityData], file_out: Path) -> RecordCityData:
     form = file_out.suffix
     if form in WRITER.keys():
         return WRITER[form](city_data, file_out)
     raise ProviderCreationError("No local provider available")
 
 
-def to_display(city_data: CityData) -> str:  # converting received city data into text strings
+def to_display(
+    city_data: CityData,
+) -> str:  # converting received city data into text strings
     return (
         f"Weather in {city_data.geo_data.city}\n"
         f"Country: {city_data.geo_data.country}\n"
