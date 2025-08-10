@@ -1,7 +1,8 @@
 import argparse
 import asyncio
+import time
 from pathlib import Path
-from typing import List, Union
+from typing import List, Union, Tuple
 
 from src.config_file_parser.file_parser import create_parser
 from src.exceptions import ProviderNoDataError
@@ -64,7 +65,7 @@ async def main(
     config_weather: WeatherConfig,
     list_city: List[Union[CityData, str]],
     num: int,
-) -> (List[CityData], List[CityData]):
+) -> Tuple[List[CityData], List[CityData]]:
     cache = []
     tasks = []
     results = []
@@ -88,6 +89,7 @@ async def main(
 
 
 if __name__ == "__main__":
+    s_t = time.monotonic()
     parser = argparse.ArgumentParser(description="Weather by config file")
     parser.add_argument("--config", type=str)
     parser.add_argument("--output", type=str)
@@ -103,12 +105,10 @@ if __name__ == "__main__":
     weather_config = config_parser.get_weather_config()
     timeout = config_parser.get_timeout()
     cities = config_parser.get_city()
-
-    if type(cities) is not list:  # parser one city name
-        cities = [cities]
-    cache_city_data = get_cache(cities, timeout)  # get cache
+    cache_city_data = get_cache(cities, timeout)
     cities_data, cache_data = asyncio.run(
         main(geo_config, weather_config, cache_city_data, 0)
     )
     asyncio.run(to_cache(cache_data, output))
     print("\n".join([to_display(data) for data in cities_data]))  # print to console
+    print(time.monotonic() - s_t)

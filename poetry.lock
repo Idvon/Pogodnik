@@ -1250,6 +1250,18 @@ files = [
 ]
 
 [[package]]
+name = "types-aiofiles"
+version = "24.1.0.20250809"
+description = "Typing stubs for aiofiles"
+optional = false
+python-versions = ">=3.9"
+groups = ["dev"]
+files = [
+    {file = "types_aiofiles-24.1.0.20250809-py3-none-any.whl", hash = "sha256:657c83f876047ffc242b34bfcd9167f201d1b02e914ee854f16e589aa95c0d45"},
+    {file = "types_aiofiles-24.1.0.20250809.tar.gz", hash = "sha256:4dc9734330b1324d9251f92edfc94fd6827fbb829c593313f034a77ac33ae327"},
+]
+
+[[package]]
 name = "types-requests"
 version = "2.29.0.0"
 description = "Typing stubs for requests"
@@ -1456,5 +1468,5 @@ propcache = ">=0.2.1"
 
 [metadata]
 lock-version = "2.1"
-python-versions = "^3.11"
-content-hash = "60ae8724dd8bdb889b3e9d792872092ff08c647ffd6f48eedbea2b5e32ac01bb"
+python-versions = "^3.13"
+content-hash = "f53108be2e1f0ebe0cf5d231a35c3d547922d9dd7ff2efbea8151135d7328e30"

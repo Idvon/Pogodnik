@@ -1,5 +1,4 @@
 import abc
-from typing import Optional
 
 import aiohttp
 
@@ -7,7 +6,7 @@ from src.structures import WeatherData
 
 
 class WeatherProvider(abc.ABC):  # base class for network weather providers
-    response: Optional[dict]
+    response: dict
     url: str
     payload: dict
 

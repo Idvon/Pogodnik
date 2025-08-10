@@ -13,7 +13,7 @@ class DBWeatherProvider(WeatherProvider):
         self.city = city
         self.timeout = timeout
 
-    def weather_data(self) -> CityData:
+    def weather_data(self):
         delta = timedelta(minutes=self.timeout)
         current_time = datetime.now(timezone.utc)
         try:
@@ -54,8 +54,7 @@ class DBWeatherProvider(WeatherProvider):
                     data[6],
                 )
                 geo_data = GeoData(data[7], data[8], data[9])
-                city_data = CityData(weather_data, geo_data)
-                return city_data
+                return CityData(weather_data, geo_data)
         except sqlite3.Error as error:
             print(f"Error connecting to DB {error}")
         raise ProviderNoDataError("No data found in cache")

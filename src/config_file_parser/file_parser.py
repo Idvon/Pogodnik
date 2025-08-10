@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import List, TextIO, Union
+from typing import List, TextIO
 
 import toml
 
@@ -29,7 +29,9 @@ class ConfigFileParser:  # base class for parsing config files
 
     def get_city(
         self,
-    ) -> Union[List[str], str]:  # obtaining a list city name or one name
+    ) -> List[str]:  # obtaining a list city name or one name
+        if type(self.config["city_name"]) is str:
+            return [self.config["city_name"]]
         return self.config["city_name"]
 
 

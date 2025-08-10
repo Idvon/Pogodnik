@@ -8,7 +8,7 @@ from src.structures import Coords, GeoConfig, GeoData
 
 
 class GeoProvider(abc.ABC):  # base class for network geo providers
-    response: Optional[List[dict]]
+    response: List[dict]
     valid_response: dict
     url: str
     payload: dict
