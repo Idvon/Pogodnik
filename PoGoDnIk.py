@@ -63,28 +63,34 @@ async def network_data(
 async def main(
     config_geo: GeoConfig,
     config_weather: WeatherConfig,
-    list_city: List[Union[CityData, str]],
+    list_city: Union[List[CityData], List[str], List[Union[CityData, str]]],
     num: int,
 ) -> Tuple[List[CityData], List[CityData]]:
     cache = []
-    tasks = []
+    tasks: List[Union[CityData, asyncio.Task]] = []
     results = []
 
     # create tasks for new data
     async with asyncio.TaskGroup() as tg:
         for city in list_city:
             if type(city) is str:
-                city = tg.create_task(
-                    network_data(config_geo, config_weather, city, num)
+                city_str = str(city)
+                tasks.append(
+                    tg.create_task(
+                        network_data(config_geo, config_weather, city_str, num)
+                    )
                 )
-            tasks.append(city)
+            elif type(city) is CityData:
+                tasks.append(city)
 
     # resulting task
     for task in tasks:
         if type(task) is asyncio.Task:
-            task = await asyncio.wait_for(task, timeout=None)
-            cache.append(task)
-        results.append(task)
+            result: CityData = await asyncio.wait_for(task, timeout=None)
+            cache.append(result)
+            results.append(result)
+        elif type(task) is CityData:
+            results.append(task)
     return results, cache
 
 
