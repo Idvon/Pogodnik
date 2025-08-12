@@ -1,3 +1,4 @@
+import asyncio
 import requests
 import requests_mock
 from pytest import raises
@@ -20,7 +21,7 @@ def test_geocoding_parser():
         m.get(OW_GEO_URL, json=GEOCODING_RESPONSE)
         requests.get(OW_GEO_URL).json()
         provider = OpenWeatherGeoProvider(GEO_CONFIG, LOCAL_CITY)
-        provider.response = GEOCODING_RESPONSE[0]
+        provider.valid_response = GEOCODING_RESPONSE[0]
         assert provider.geo_data() == GEO_DATA
     assert provider.get_coords() == COORDS
 
@@ -31,7 +32,7 @@ def test_geocoding_city_not_found():
         requests.get(OW_GEO_URL).json()
         provider = OpenWeatherGeoProvider(GEO_CONFIG, LOCAL_CITY)
     with raises(ProviderNoDataError):
-        provider.request()
+        asyncio.run(provider.request())
 
 
 def test_geocoding_api_error():
@@ -40,4 +41,4 @@ def test_geocoding_api_error():
         requests.get(OW_GEO_URL).json()
         provider = OpenWeatherGeoProvider(GEO_CONFIG, LOCAL_CITY)
     with raises(ProviderNoDataError):
-        provider.request()
+        asyncio.run(provider.request())

@@ -3,7 +3,7 @@ from pathlib import Path
 
 from freezegun import freeze_time
 
-from src.structures import Coords, GeoConfig, GeoData, WeatherConfig, WeatherData
+from src.structures import Coords, GeoConfig, GeoData, WeatherConfig, WeatherData, CityData
 
 GEO_CONFIG = GeoConfig("provider", 2, "api_key")
 GEO_DATA = GeoData("London", "GB", "England")
@@ -37,6 +37,18 @@ with freeze_time("2023-01-01 00:00:00.000000+00:00"):
         95,
         11.9,
     )
+    OW_CITY_DATA = CityData(
+        OW_WEATHER_DATA,
+        GEO_DATA
+    )
+    OM_CITY_DATA = CityData(
+        OM_WEATHER_DATA,
+        GEO_DATA
+    )
+    LIST_CITY_DATA = [
+        OW_CITY_DATA,
+        OM_CITY_DATA
+    ]
 
 OW_RESPONSE = {
     "coord": {"lon": 10.99, "lat": 44.34},
