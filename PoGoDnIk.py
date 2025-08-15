@@ -12,7 +12,7 @@ from src.structures import CityData, GeoConfig, WeatherConfig
 from src.weather.providers.local import create_local_weather_provider
 from src.weather.providers.network import create_net_weather_provider
 
-FILE_DB = Path("db1.sqlite3")
+FILE_DB = Path("db.sqlite3")
 
 
 # get valid cache from DB file
@@ -112,7 +112,9 @@ if __name__ == "__main__":
     timeout = config_parser.get_timeout()
     cities = config_parser.get_city()
     cache_city_data = get_cache(cities, timeout)
-    print(cache_city_data)
+    match cache_city_data:
+        case []:
+            cache_city_data = cities
     cities_data, cache_data = asyncio.run(
         main(geo_config, weather_config, cache_city_data, 0)
     )

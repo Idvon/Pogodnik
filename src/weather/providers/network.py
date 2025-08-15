@@ -41,6 +41,7 @@ class OpenMeteoWeatherProvider(WeatherProvider):
                 "wind_direction_10m",
                 "wind_speed_10m",
             ],
+            "wind_speed_unit": "ms",
         }
         self.url = "https://api.open-meteo.com/v1/forecast"
 
