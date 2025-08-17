@@ -1,21 +1,25 @@
 import abc
-from typing import Optional
 
-from requests import get
+import aiohttp
 
 from src.structures import WeatherData
 
 
-class WeatherProvider(abc.ABC):
+class WeatherProvider(abc.ABC):  # base class for network weather providers
+    response: dict
     url: str
     payload: dict
 
-    def request(self) -> Optional[dict]:
-        return get(self.url, params=self.payload).json()
+    async def request(
+        self,
+    ) -> None:  # request and record weather data from a network provider's
+        async with aiohttp.ClientSession() as session:
+            async with session.get(self.url, params=self.payload) as response:
+                self.response = await response.json()
 
     @abc.abstractmethod
-    def weather_data(self, response: Optional[dict]) -> WeatherData:
+    def weather_data(self) -> WeatherData:
         """
         Parse response and return data structure
         """
-        return WeatherData._make({})
+        return WeatherData._make(self.response)

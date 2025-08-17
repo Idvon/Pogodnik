@@ -32,3 +32,8 @@ class WeatherData(NamedTuple):
     winddir: str
     winddeg: int
     windspeed: float
+
+
+class CityData(NamedTuple):
+    weather_data: WeatherData
+    geo_data: GeoData

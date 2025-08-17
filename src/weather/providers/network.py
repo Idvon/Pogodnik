@@ -16,17 +16,17 @@ class OpenWeatherWeatherProvider(WeatherProvider):
         }
         self.url = "https://api.openweathermap.org/data/2.5/weather"
 
-    def weather_data(self, response):
-        if response["cod"] != 200:
+    def weather_data(self):
+        if self.response["cod"] != 200:
             raise ProviderNoDataError("Please, check weather API key")
         return WeatherData(
             datetime.now(timezone.utc),
             "openweather",
-            response["main"]["temp"],
-            response["main"]["humidity"],
-            direction(response["wind"]["deg"]),
-            response["wind"]["deg"],
-            response["wind"]["speed"],
+            self.response["main"]["temp"],
+            self.response["main"]["humidity"],
+            direction(self.response["wind"]["deg"]),
+            self.response["wind"]["deg"],
+            self.response["wind"]["speed"],
         )
 
 
@@ -35,23 +35,25 @@ class OpenMeteoWeatherProvider(WeatherProvider):
         self.payload = {
             "latitude": coords.lat,
             "longitude": coords.lon,
-            "current": "relative_humidity_2m,"
-                       "temperature_2m,"
-                       "wind_speed_10m,"
-                       "wind_direction_10m,",
+            "current": [
+                "temperature_2m",
+                "relative_humidity_2m",
+                "wind_direction_10m",
+                "wind_speed_10m",
+            ],
             "wind_speed_unit": "ms",
         }
         self.url = "https://api.open-meteo.com/v1/forecast"
 
-    def weather_data(self, response):
+    def weather_data(self):
         return WeatherData(
             datetime.now(timezone.utc),
             "openmeteo",
-            response["current"]["temperature_2m"],
-            response["current"]["relative_humidity_2m"],
-            direction(int(response["current"]["wind_direction_10m"])),
-            int(response["current"]["wind_direction_10m"]),
-            response["current"]["wind_speed_10m"],
+            self.response["current"]["temperature_2m"],
+            self.response["current"]["relative_humidity_2m"],
+            direction(int(self.response["current"]["wind_direction_10m"])),
+            int(self.response["current"]["wind_direction_10m"]),
+            self.response["current"]["wind_speed_10m"],
         )
 
 

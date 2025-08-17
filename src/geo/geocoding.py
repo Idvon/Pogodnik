@@ -1,35 +1,39 @@
-from typing import Dict, List, Union
+import abc
+from typing import Dict, List, Optional, Union
 
-from requests import get
+import aiohttp
 
 from src.exceptions import ProviderCreationError, ProviderNoDataError
 from src.structures import Coords, GeoConfig, GeoData
 
 
-class GeoProvider:
-    response: dict
+class GeoProvider(abc.ABC):  # base class for network geo providers
+    response: List[dict]
+    valid_response: dict
     url: str
     payload: dict
 
-    def request(self) -> List[Dict[int, str]]:
-        valid_list = get(self.url, params=self.payload).json()
-        match valid_list:
-            case []:
-                raise ProviderNoDataError(
-                    "This city is not found. Please, check city name"
-                )
-            case {"cod": 401, **args}:
-                raise ProviderNoDataError("Please, check geo API key")
-        return valid_list
+    async def request(
+        self,
+    ) -> None:  # request and record geo data from a network provider's
+        async with aiohttp.ClientSession() as session:
+            async with session.get(self.url, params=self.payload) as response:
+                self.response = await response.json()
 
-    def get_coords(self) -> Coords:
-        return Coords(self.response["lat"], self.response["lon"])
+    def get_coords(
+        self,
+    ) -> Coords:  # extraction of coordinates from the geo provider's response
+        return Coords(self.valid_response["lat"], self.valid_response["lon"])
 
-    def get_city_data(self) -> GeoData:
+    def geo_data(
+        self,
+    ) -> (
+        GeoData
+    ):  # extraction of city name and city country from the geo provider's response
         return GeoData(
-            self.response["name"],
-            self.response["country"],
-            self.response.get("state", ""),
+            self.valid_response["name"],
+            self.valid_response["country"],
+            self.valid_response.get("state", ""),
         )
 
 
@@ -41,6 +45,16 @@ class OpenWeatherGeoProvider(GeoProvider):
             "appid": geo_config.api_key,
         }
         self.url = "https://api.openweathermap.org/geo/1.0/direct"
+
+    async def request(self):
+        await super().request()
+        match self.response:
+            case []:
+                raise ProviderNoDataError(
+                    "This city is not found. Please, check city name"
+                )
+            case {"cod": 401, **args}:
+                raise ProviderNoDataError("Please, check geo API key")
 
 
 PROVIDERS = {"openweather": OpenWeatherGeoProvider}

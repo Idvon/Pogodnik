@@ -3,7 +3,14 @@ from pathlib import Path
 
 from freezegun import freeze_time
 
-from src.structures import Coords, GeoConfig, GeoData, WeatherConfig, WeatherData
+from src.structures import (
+    CityData,
+    Coords,
+    GeoConfig,
+    GeoData,
+    WeatherConfig,
+    WeatherData,
+)
 
 GEO_CONFIG = GeoConfig("provider", 2, "api_key")
 GEO_DATA = GeoData("London", "GB", "England")
@@ -17,6 +24,8 @@ OM_URL = "https://api.open-meteo.com/v1/forecast"
 
 LOCAL_FILE = Path("db.sqlite3")
 LOCAL_CITY = "London"
+
+TIMEOUT = 0
 
 with freeze_time("2023-01-01 00:00:00.000000+00:00"):
     OW_WEATHER_DATA = WeatherData(
@@ -37,6 +46,9 @@ with freeze_time("2023-01-01 00:00:00.000000+00:00"):
         95,
         11.9,
     )
+    OW_CITY_DATA = CityData(OW_WEATHER_DATA, GEO_DATA)
+    OM_CITY_DATA = CityData(OM_WEATHER_DATA, GEO_DATA)
+    LIST_CITY_DATA = [OW_CITY_DATA, OM_CITY_DATA]
 
 OW_RESPONSE = {
     "coord": {"lon": 10.99, "lat": 44.34},
@@ -78,18 +90,28 @@ OW_RESPONSE = {
 }
 
 OM_RESPONSE = {
-    "current_weather": {
-        "time": "2022-01-01T02:00",
-        "temperature": 2.4,
-        "weathercode": 3,
-        "windspeed": 11.9,
-        "winddirection": 95.0,
+    "latitude": 51.5,
+    "longitude": -0.120000124,
+    "generationtime_ms": 0.07534027099609375,
+    "utc_offset_seconds": 0,
+    "timezone": "GMT",
+    "timezone_abbreviation": "GMT",
+    "elevation": 1.0,
+    "current_units": {
+        "time": "iso8601",
+        "interval": "seconds",
+        "temperature_2m": "°C",
+        "relative_humidity_2m": "%",
+        "wind_direction_10m": "°",
+        "wind_speed_10m": "m/s",
     },
-    "hourly": {
-        "time": ["2022-01-01T00:00", "2022-01-01T01:00", "2022-01-01T02:00"],
-        "windspeed_10m": [3.16, 3.02, 3.3],
-        "temperature_2m": [13.7, 13.3, 12.8],
-        "relativehumidity_2m": [82, 83, 86],
+    "current": {
+        "time": "2025-08-14T17:15",
+        "interval": 900,
+        "temperature_2m": 2.4,
+        "relative_humidity_2m": 86,
+        "wind_direction_10m": 95,
+        "wind_speed_10m": 11.9,
     },
 }
 GEOCODING_RESPONSE = [
