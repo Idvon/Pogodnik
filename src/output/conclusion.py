@@ -1,4 +1,5 @@
 import abc
+import sqlite3
 from pathlib import Path
 from typing import List
 
@@ -50,28 +51,29 @@ class DatabaseWriter(RecordCityData):
             for i in range(len(self.city_data))
         ]
         try:
-            async with aiosqlite.connect(self.file_out) as db:
-                headers = """
-                    CREATE TABLE IF NOT EXISTS weather_results (
-                    datetime date,
-                    provider text,
-                    temp real,
-                    hum integer,
-                    winddir text,
-                    winddeg integer,
-                    windspeed real,
-                    city text,
-                    country text,
-                    state text)
-                    """
-                async with db.execute(headers) as cursor:
-                    await cursor.executemany(
-                        "INSERT INTO weather_results VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                        values,
-                    )
-                await db.commit()
-                await cursor.close()
-        except aiosqlite.Error as error:
+            db = await aiosqlite.connect(self.file_out)
+            headers = """
+                CREATE TABLE IF NOT EXISTS weather_results (
+                datetime date,
+                provider text,
+                temp real,
+                hum integer,
+                winddir text,
+                winddeg integer,
+                windspeed real,
+                city text,
+                country text,
+                state text)
+                """
+            cursor = await db.cursor()
+            await cursor.execute(headers)
+            await cursor.executemany(
+                "INSERT INTO weather_results VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                values,
+            )
+            await db.commit()
+            await cursor.close()
+        except sqlite3.Error as error:
             print(f"Error connecting to DB {error}")
         finally:
             await db.close()

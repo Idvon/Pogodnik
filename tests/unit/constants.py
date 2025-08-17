@@ -3,7 +3,14 @@ from pathlib import Path
 
 from freezegun import freeze_time
 
-from src.structures import Coords, GeoConfig, GeoData, WeatherConfig, WeatherData, CityData
+from src.structures import (
+    CityData,
+    Coords,
+    GeoConfig,
+    GeoData,
+    WeatherConfig,
+    WeatherData,
+)
 
 GEO_CONFIG = GeoConfig("provider", 2, "api_key")
 GEO_DATA = GeoData("London", "GB", "England")
@@ -39,18 +46,9 @@ with freeze_time("2023-01-01 00:00:00.000000+00:00"):
         95,
         11.9,
     )
-    OW_CITY_DATA = CityData(
-        OW_WEATHER_DATA,
-        GEO_DATA
-    )
-    OM_CITY_DATA = CityData(
-        OM_WEATHER_DATA,
-        GEO_DATA
-    )
-    LIST_CITY_DATA = [
-        OW_CITY_DATA,
-        OM_CITY_DATA
-    ]
+    OW_CITY_DATA = CityData(OW_WEATHER_DATA, GEO_DATA)
+    OM_CITY_DATA = CityData(OM_WEATHER_DATA, GEO_DATA)
+    LIST_CITY_DATA = [OW_CITY_DATA, OM_CITY_DATA]
 
 OW_RESPONSE = {
     "coord": {"lon": 10.99, "lat": 44.34},
@@ -105,7 +103,7 @@ OM_RESPONSE = {
         "temperature_2m": "°C",
         "relative_humidity_2m": "%",
         "wind_direction_10m": "°",
-        "wind_speed_10m": "m/s"
+        "wind_speed_10m": "m/s",
     },
     "current": {
         "time": "2025-08-14T17:15",
@@ -113,7 +111,7 @@ OM_RESPONSE = {
         "temperature_2m": 2.4,
         "relative_humidity_2m": 86,
         "wind_direction_10m": 95,
-        "wind_speed_10m": 11.9
+        "wind_speed_10m": 11.9,
     },
 }
 GEOCODING_RESPONSE = [

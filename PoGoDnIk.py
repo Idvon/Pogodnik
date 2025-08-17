@@ -1,6 +1,5 @@
 import argparse
 import asyncio
-import time
 from pathlib import Path
 from typing import List, Tuple, Union
 
@@ -95,7 +94,6 @@ async def main(
 
 
 if __name__ == "__main__":
-    s_t = time.monotonic()
     parser = argparse.ArgumentParser(description="Weather by config file")
     parser.add_argument("--config", type=str)
     parser.add_argument("--output", type=str)
@@ -112,12 +110,13 @@ if __name__ == "__main__":
     timeout = config_parser.get_timeout()
     cities = config_parser.get_city()
     cache_city_data = get_cache(cities, timeout)
-    match cache_city_data:
-        case []:
-            cache_city_data = cities
-    cities_data, cache_data = asyncio.run(
-        main(geo_config, weather_config, cache_city_data, 0)
-    )
+    if cache_city_data:
+        cities_data, cache_data = asyncio.run(
+            main(geo_config, weather_config, cache_city_data, 0)
+        )
+    else:
+        cities_data, cache_data = asyncio.run(
+            main(geo_config, weather_config, cities, 0)
+        )
     asyncio.run(to_cache(cache_data, output))
     print("\n".join([to_display(data) for data in cities_data]))  # print to console
-    print(time.monotonic() - s_t)
