@@ -60,13 +60,19 @@ async def data(num: int, city_name: str):
     city_name_list = [city_name]
     output = Path("o.csv")
     weather_config = get_config().get_weather_config()
+    weather_provider = get_config().get_weather_config().provider
     geo_config = get_config().get_geo_config()
     city_data, cache_data = await main(
         geo_config, weather_config, city_name_list, num - 1
     )
     await to_cache(cache_data, output)
     data_template = to_display(city_data[0])
-    return render_template("data.html", data=data_template)
+    match weather_provider:
+        case "openweather":
+            return render_template("data_ow.html", data=data_template)
+        case "openmeteo":
+            return render_template("data_om.html", data=data_template)
+
 
 
 # exception page
