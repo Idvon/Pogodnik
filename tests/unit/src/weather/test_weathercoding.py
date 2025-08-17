@@ -15,7 +15,6 @@ from tests.unit.constants import (
     GEO_DATA,
     LOCAL_CITY,
     LOCAL_FILE,
-    LOCAL_TIMEOUT,
     OM_RESPONSE,
     OM_URL,
     OM_WEATHER_CONFIG,
@@ -24,6 +23,7 @@ from tests.unit.constants import (
     OW_URL,
     OW_WEATHER_CONFIG,
     OW_WEATHER_DATA,
+    TIMEOUT,
 )
 
 with requests_mock.Mocker() as m:
@@ -41,7 +41,8 @@ def test_openweather_parsing():
     assert isinstance(provider, OpenWeatherWeatherProvider)
     with requests_mock.Mocker() as m:
         m.get(OW_URL, json=OW_RESPONSE)
-        assert provider.weather_data(provider.request()) == OW_WEATHER_DATA
+        provider.response = requests.get(OW_URL).json()
+        assert provider.weather_data() == OW_WEATHER_DATA
 
 
 @freeze_time("2023-01-01 00:00:00.000000+00:00")
@@ -50,7 +51,8 @@ def test_openmeteo_parsing():
     assert isinstance(provider, OpenMeteoWeatherProvider)
     with requests_mock.Mocker() as m:
         m.get(OM_URL, json=OM_RESPONSE)
-        assert provider.weather_data(provider.request()) == OM_WEATHER_DATA
+        provider.response = requests.get(OM_URL).json()
+        assert provider.weather_data() == OM_WEATHER_DATA
 
 
 def test_net_provider_creation():
@@ -78,6 +80,6 @@ def test_db_weather_provider(mocked_connect):
             "England",
         )
     ]
-    provider = DBWeatherProvider(LOCAL_FILE, LOCAL_CITY, LOCAL_TIMEOUT)
+    provider = DBWeatherProvider(LOCAL_FILE, LOCAL_CITY, TIMEOUT)
     data = provider.weather_data()
     assert data == (OW_WEATHER_DATA, GEO_DATA)

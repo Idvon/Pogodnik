@@ -3,18 +3,19 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from src.exceptions import ProviderCreationError, ProviderNoDataError
-from src.structures import GeoData, WeatherData
+from src.structures import CityData, GeoData, WeatherData
 from src.weather.providers.base import WeatherProvider
 
 
 class DBWeatherProvider(WeatherProvider):
     def __init__(self, file: Path, city: str, timeout: int):
         self.file = file
-        self.timeout = timeout
         self.city = city
+        self.timeout = timeout
 
-    def weather_data(self, _=None):
-        delta = timedelta(seconds=self.timeout * 60)
+    def weather_data(self):
+        delta = timedelta(minutes=self.timeout)
+        current_time = datetime.now(timezone.utc)
         try:
             sqlite_connection = sqlite3.connect(self.file)
             cursor = sqlite_connection.cursor()
@@ -39,25 +40,23 @@ class DBWeatherProvider(WeatherProvider):
             if len(row) == 0:
                 raise ProviderNoDataError("No data found in cache")
             data = row[-1]
-            weather_data = WeatherData(
-                datetime.fromisoformat(data[0]),
-                data[1],
-                data[2],
-                data[3],
-                data[4],
-                data[5],
-                data[6],
-            )
-            geo_data = GeoData(data[7], data[8], data[9])
             cursor.close()
+            sqlite_connection.close()
+            cache_time = datetime.fromisoformat(data[0])
+            if (current_time - cache_time) <= delta:
+                weather_data = WeatherData(
+                    cache_time,
+                    data[1],
+                    data[2],
+                    data[3],
+                    data[4],
+                    data[5],
+                    data[6],
+                )
+                geo_data = GeoData(data[7], data[8], data[9])
+                return CityData(weather_data, geo_data)
         except sqlite3.Error as error:
             print(f"Error connecting to DB {error}")
-        finally:
-            sqlite_connection.close()
-        current_time = datetime.now(timezone.utc)
-        last_time = weather_data.datetime
-        if (current_time - last_time) <= delta:
-            return weather_data, geo_data
         raise ProviderNoDataError("No data found in cache")
 
 
