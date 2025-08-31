@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <title>FlaskApp</title>
@@ -37,7 +38,7 @@
         </a>
     </body>
     <div
-        id="openweathermap-widget-1">
+        id="openweathermap-widget-21">
     </div>
     <script
         src='//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/d3.min.js'>
@@ -45,11 +46,11 @@
     <script>
         window.myWidgetParam ? window.myWidgetParam : window.myWidgetParam = [];
         window.myWidgetParam.push({
-        id: 1,
+        id: 21,
         cityid: '498817',
-        appid: '',
+        appid: '{{key}}',
         units: 'metric',
-        containerid: 'openweathermap-widget-1',
+        containerid: 'openweathermap-widget-21',
         });
         (function() {
         var script = document.createElement('script');
@@ -60,4 +61,4 @@
         s.parentNode.insertBefore(script, s);
         })();
     </script>
-</html>>
+</html>

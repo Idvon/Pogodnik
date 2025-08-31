@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+		<meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>FlaskApp</title>
+        <!-- CSS FILES -->
+        <link rel="stylesheet" type="text/css" href="../css/uikit.min.css" />
+    </head>
+    <body bgcolor="black" data-uk-height-viewport>
+    	<!--HEADER-->
+		<header>
+			<div class="uk-padding uk-light uk-text-center">
+				<h1>Welcome to PoGoDnIk!</h1>
+        		<h2>Enter the city name:</h2>
+        		<form class="toggle-class" action="index.html" method="post">
+					<div class="uk-inline">
+						<span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: search-icon"></span>
+						<input class="uk-input uk-border-pill" required placeholder="City Name" type="text"
+							   name="city_name">
+					</div>
+					<div class="uk-margin-small">
+						<button type="submit" class="uk-button-primary uk-border-pill uk-button-large">
+							Dai mne weather
+						</button>
+					</div>
+        		</form>
+			</div>
+		</header>
+		<!--/HEADER-->
+
+		<!--CONTENT-->
+		<section>
+			<div style="text-align: center;" class="uk-padding">
+				<img src="../img/weather-app.svg">
+			</div>
+		</section>
+		<!--/CONTENT-->
+
+        <!-- JS FILES -->
+        <script src="../js/uikit.min.js"></script>
+        <script src="../js/uikit-icons.min.js"></script>
+    </body>
+</html>

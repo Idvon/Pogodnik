@@ -9,7 +9,7 @@ from src.geo.geocoding import create_geo_provider
 from src.output.conclusion import to_display
 from src.structures import CityData
 
-APP = Flask(__name__)
+APP = Flask(__name__, template_folder="web/templates")
 CONFIG = Path("c.json")
 
 
@@ -61,6 +61,7 @@ async def data(num: int, city_name: str):
     output = Path("o.csv")
     weather_config = get_config().get_weather_config()
     weather_provider = get_config().get_weather_config().provider
+    key = get_config().get_weather_config().api_key
     geo_config = get_config().get_geo_config()
     city_data, cache_data = await main(
         geo_config, weather_config, city_name_list, num - 1
@@ -69,10 +70,9 @@ async def data(num: int, city_name: str):
     data_template = to_display(city_data[0])
     match weather_provider:
         case "openweather":
-            return render_template("data_ow.html", data=data_template)
+            return render_template("data_ow.html", data=data_template, key=key)
         case "openmeteo":
             return render_template("data_om.html", data=data_template)
-
 
 
 # exception page
