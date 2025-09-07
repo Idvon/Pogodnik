@@ -32,6 +32,7 @@ class WeatherData(NamedTuple):
     winddir: str
     winddeg: int
     windspeed: float
+    cityid: int | None
 
 
 class CityData(NamedTuple):

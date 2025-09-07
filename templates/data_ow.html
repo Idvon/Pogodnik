@@ -1,64 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+		<meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>FlaskApp</title>
-        <style>
-            .text{
-            font-family: "Comic Sans", sans-serif;
-            color: white;
-            }
-        </style>
-        <style>
-            .button-class {
-            background-color: #21C5DD;
-            border: none;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 4px;
-            }
-        </style>
+        <!-- CSS FILES -->
+        <link rel="stylesheet" type="text/css" href="/static/css/uikit.min.css" />
     </head>
-    <body bgcolor="black">
-        <p class="text">
-            {% set data = data.split('\n') %}
-            {% for item in data %}
-            {{ item }}
-                {% if not loop.last %}
-                 <br/>
-                {% endif %}
-            {% endfor %}
-        </p>
-        <a href="/" class="button-class">
-           return
-        </a>
+    <body bgcolor="black" data-uk-height-viewport>
+        <!--HEADER-->
+		<header>
+            <div class="uk-padding uk-light uk-text-left uk-text-large uk-inline">
+                <p class="text" style="color: white">
+                    {% set data = data.split('\n') %}
+                    {% for item in data %}
+                    {{ item }}
+                        {% if not loop.last %}
+                         <br/>
+                        {% endif %}
+                    {% endfor %}
+                </p>
+                <div class="uk-margin-small uk-text-default">
+                    <a href="/" class="uk-button uk-button-primary uk-border-pill uk-button-large">
+                        Return
+                    </a>
+                </div>
+            </div>
+        </header>
+		<!--/HEADER-->
+
+        <!--CONTENT-->
+		<section>
+			<div style="text-align: center;" class="uk-padding">
+				<div id="openweathermap-widget-21">
+                </div>
+                <script
+                    src='//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/d3.min.js'>
+                </script>
+                <script>
+                    window.myWidgetParam ? window.myWidgetParam : window.myWidgetParam = [];
+                    window.myWidgetParam.push({
+                    id: 21,
+                    cityid: '{{cityid}}',
+                    appid: '{{key}}',
+                    units: 'metric',
+                    containerid: 'openweathermap-widget-21',
+                    });
+                    (function() {
+                    var script = document.createElement('script');
+                    script.async = true;
+                    script.charset = "utf-8";
+                    script.src = "//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/weather-widget-generator.js";
+                    var s = document.getElementsByTagName('script')[0];
+                    s.parentNode.insertBefore(script, s);
+                    })();
+                </script>
+			</div>
+		</section>
+		<!--/CONTENT-->
+
+        <!-- JS FILES -->
+        <script src="/static/js/uikit.min.js"></script>
+        <script src="/static/js/uikit-icons.min.js"></script>
     </body>
-    <div
-        id="openweathermap-widget-21">
-    </div>
-    <script
-        src='//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/d3.min.js'>
-    </script>
-    <script>
-        window.myWidgetParam ? window.myWidgetParam : window.myWidgetParam = [];
-        window.myWidgetParam.push({
-        id: 21,
-        cityid: '498817',
-        appid: '{{key}}',
-        units: 'metric',
-        containerid: 'openweathermap-widget-21',
-        });
-        (function() {
-        var script = document.createElement('script');
-        script.async = true;
-        script.charset = "utf-8";
-        script.src = "//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/weather-widget-generator.js";
-        var s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(script, s);
-        })();
-    </script>
 </html>

@@ -61,6 +61,7 @@ class DatabaseWriter(RecordCityData):
                 winddir text,
                 winddeg integer,
                 windspeed real,
+                cityid integer,
                 city text,
                 country text,
                 state text)
@@ -68,7 +69,7 @@ class DatabaseWriter(RecordCityData):
             cursor = await db.cursor()
             await cursor.execute(headers)
             await cursor.executemany(
-                "INSERT INTO weather_results VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO weather_results VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 values,
             )
             await db.commit()

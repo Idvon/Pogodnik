@@ -10,19 +10,15 @@
     <body bgcolor="black" data-uk-height-viewport>
         <!--HEADER-->
 		<header>
-            <div class="uk-padding uk-light uk-text-left uk-text-large">
-                <form class="uk-padding" method="post">
-                    <div class="uk-inline">
-                        <p class="text">
-                            {% for key, val in city_list.items() %}
-                            <a href="{{ url_for('data', num=key, city_name=city_name) }}">{{ key }}. {{ val }}</a>
-                                {% if not loop.last %}
-                                 <br/>
-                                {% endif %}
-                            {% endfor %}
-                        </p>
-                    </div>
-                </form>
+            <div class="uk-padding uk-light uk-text-left uk-text-large uk-inline">
+                <p class="text" style="color: white">
+                    {% for key, val in city_list.items() %}
+                    <a href="{{ url_for('data', num=key, city_name=city_name) }}">{{ key }}. {{ val }}</a>
+                        {% if not loop.last %}
+                         <br/>
+                        {% endif %}
+                    {% endfor %}
+                </p>
             </div>
         </header>
 		<!--/HEADER-->

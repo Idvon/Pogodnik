@@ -22,11 +22,12 @@ class OpenWeatherWeatherProvider(WeatherProvider):
         return WeatherData(
             datetime.now(timezone.utc),
             "openweather",
-            self.response["main"]["temp"],
+            self.response["main"]["feels_like"],
             self.response["main"]["humidity"],
             direction(self.response["wind"]["deg"]),
             self.response["wind"]["deg"],
             self.response["wind"]["speed"],
+            self.response["id"],
         )
 
 
@@ -36,7 +37,7 @@ class OpenMeteoWeatherProvider(WeatherProvider):
             "latitude": coords.lat,
             "longitude": coords.lon,
             "current": [
-                "temperature_2m",
+                "apparent_temperature",
                 "relative_humidity_2m",
                 "wind_direction_10m",
                 "wind_speed_10m",
@@ -49,11 +50,12 @@ class OpenMeteoWeatherProvider(WeatherProvider):
         return WeatherData(
             datetime.now(timezone.utc),
             "openmeteo",
-            self.response["current"]["temperature_2m"],
+            self.response["current"]["apparent_temperature"],
             self.response["current"]["relative_humidity_2m"],
             direction(int(self.response["current"]["wind_direction_10m"])),
             int(self.response["current"]["wind_direction_10m"]),
             self.response["current"]["wind_speed_10m"],
+            None,
         )
 
 

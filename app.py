@@ -39,11 +39,14 @@ async def response(city_name: str):
     key = get_config().get_weather_config().api_key
     city_name_list = [city_name]
     cache = get_cache(city_name_list, timeout)
-    if type(cache[0]) is CityData:
+    if cache and (type(cache[0]) is CityData):
         text = to_display(cache[0])
+        cityid = cache[0].weather_data.cityid
         match weather_provider:
             case "openweather":
-                return render_template("data_ow.html", data=text, key=key)
+                return render_template(
+                    "data_ow.html", data=text, key=key, cityid=cityid
+                )
             case "openmeteo":
                 return render_template("data_om.html", data=text)
     else:
@@ -74,9 +77,12 @@ async def data(num: int, city_name: str):
     )
     await to_cache(cache_data, output)
     data_template = to_display(city_data[0])
+    cityid = city_data[0].weather_data.cityid
     match weather_provider:
         case "openweather":
-            return render_template("data_ow.html", data=data_template, key=key)
+            return render_template(
+                "data_ow.html", data=data_template, key=key, cityid=cityid
+            )
         case "openmeteo":
             return render_template("data_om.html", data=data_template)
 
