@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>FlaskApp</title>
         <!-- CSS FILES -->
-        <link rel="stylesheet" type="text/css" href="../css/uikit.min.css" />
+        <link rel="stylesheet" type="text/css" href="/static/css/uikit.min.css" />
     </head>
     <body bgcolor="black" data-uk-height-viewport>
     	<!--HEADER-->
@@ -13,10 +13,10 @@
 			<div class="uk-padding uk-light uk-text-center">
 				<h1>Welcome to PoGoDnIk!</h1>
         		<h2>Enter the city name:</h2>
-        		<form class="toggle-class" action="index.html" method="post">
+				<form class="uk-padding" method="post">
 					<div class="uk-inline">
 						<span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: search-icon"></span>
-						<input class="uk-input uk-border-pill" required placeholder="City Name" type="text"
+						<input class="uk-input uk-border-pill" placeholder="City Name" type="text"
 							   name="city_name">
 					</div>
 					<div class="uk-margin-small">
@@ -24,7 +24,7 @@
 							Dai mne weather
 						</button>
 					</div>
-        		</form>
+				</form>
 			</div>
 		</header>
 		<!--/HEADER-->
@@ -32,13 +32,13 @@
 		<!--CONTENT-->
 		<section>
 			<div style="text-align: center;" class="uk-padding">
-				<img src="../img/weather-app.svg">
+				<img src="/static/img/weather-app.svg">
 			</div>
 		</section>
 		<!--/CONTENT-->
 
         <!-- JS FILES -->
-        <script src="../js/uikit.min.js"></script>
-        <script src="../js/uikit-icons.min.js"></script>
+        <script src="/static/js/uikit.min.js"></script>
+        <script src="/static/js/uikit-icons.min.js"></script>
     </body>
 </html>

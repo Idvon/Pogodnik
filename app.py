@@ -9,7 +9,7 @@ from src.geo.geocoding import create_geo_provider
 from src.output.conclusion import to_display
 from src.structures import CityData
 
-APP = Flask(__name__, template_folder="web/templates")
+APP = Flask(__name__)
 CONFIG = Path("c.json")
 
 
@@ -35,11 +35,17 @@ def web_conclusion():
 async def response(city_name: str):
     geo_config = get_config().get_geo_config()
     timeout = get_config().get_timeout()
+    weather_provider = get_config().get_weather_config().provider
+    key = get_config().get_weather_config().api_key
     city_name_list = [city_name]
     cache = get_cache(city_name_list, timeout)
     if type(cache[0]) is CityData:
         text = to_display(cache[0])
-        return render_template("data.html", data=text)
+        match weather_provider:
+            case "openweather":
+                return render_template("data_ow.html", data=text, key=key)
+            case "openmeteo":
+                return render_template("data_om.html", data=text)
     else:
         geo_provider = create_geo_provider(geo_config, city_name_list[0])
         await geo_provider.request()
