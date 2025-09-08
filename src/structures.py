@@ -27,11 +27,14 @@ class Coords(NamedTuple):
 class WeatherData(NamedTuple):
     datetime: datetime
     provider: str
+    status: str
     temp: float
     hum: int
     winddir: str
     winddeg: int
     windspeed: float
+    clouds: int
+    precipitation: float
     cityid: int | None
 
 

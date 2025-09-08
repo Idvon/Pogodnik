@@ -24,11 +24,14 @@ class DBWeatherProvider(WeatherProvider):
                 SELECT
                 datetime,
                 provider,
+                status,
                 temp,
                 hum,
                 winddir,
                 winddeg,
                 windspeed,
+                clouds,
+                precipitation,
                 cityid,
                 city,
                 country,
@@ -54,8 +57,11 @@ class DBWeatherProvider(WeatherProvider):
                     data[5],
                     data[6],
                     data[7],
+                    data[8],
+                    data[9],
+                    data[10],
                 )
-                geo_data = GeoData(data[8], data[9], data[10])
+                geo_data = GeoData(data[11], data[12], data[13])
                 return CityData(weather_data, geo_data)
         except sqlite3.Error as error:
             print(f"Error connecting to DB {error}")

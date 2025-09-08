@@ -56,11 +56,14 @@ class DatabaseWriter(RecordCityData):
                 CREATE TABLE IF NOT EXISTS weather_results (
                 datetime date,
                 provider text,
+                status text,
                 temp real,
                 hum integer,
                 winddir text,
                 winddeg integer,
                 windspeed real,
+                clouds integer,
+                precipitation real,
                 cityid integer,
                 city text,
                 country text,
@@ -69,7 +72,7 @@ class DatabaseWriter(RecordCityData):
             cursor = await db.cursor()
             await cursor.execute(headers)
             await cursor.executemany(
-                "INSERT INTO weather_results VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO weather_results VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 values,
             )
             await db.commit()
@@ -97,9 +100,12 @@ def to_display(
         f"Weather in {city_data.geo_data.city}\n"
         f"Country: {city_data.geo_data.country}\n"
         f"State: {city_data.geo_data.state}\n"
+        f"Status: {city_data.weather_data.status}\n"
         f"Temperature: {city_data.weather_data.temp} \N{degree sign}C\n"
         f"Humidity: {city_data.weather_data.hum} %\n"
         f"Wind speed: {city_data.weather_data.windspeed} m/s\n"
         f"Wind direction: {city_data.weather_data.winddir}\n"
+        f"Clouds: {city_data.weather_data.clouds} %\n"
+        f"Precipitation: {city_data.weather_data.precipitation} mm\n"
         f"By {city_data.weather_data.provider}\n"
     )
