@@ -7,11 +7,8 @@ from freezegun import freeze_time
 
 from src.output.conclusion import DatabaseWriter
 from tests.unit.constants import (
-    GEO_DATA,
     LIST_CITY_DATA,
     LOCAL_FILE,
-    OW_CITY_DATA,
-    OW_WEATHER_DATA,
 )
 
 
