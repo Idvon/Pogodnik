@@ -1,5 +1,5 @@
 {
-"city_name": "Saint Petersburg",
+"city_name": "city or list cities",
 "timeout": 0,
 "weather_provider": {
   "name": "openweather",
