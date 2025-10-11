@@ -4,7 +4,7 @@ from flask import Flask, redirect, render_template, request, url_for
 
 from PoGoDnIk import get_cache, main, to_cache
 from src.config_file_parser.file_parser import create_parser
-from src.exceptions import ProviderNoDataError, ProviderCreationError
+from src.exceptions import ProviderCreationError, ProviderNoDataError
 from src.geo.geocoding import create_geo_provider
 from src.output.conclusion import to_display
 from src.structures import CityData
@@ -58,7 +58,7 @@ async def response(city_name: str):
             for elem in city_list:
                 town_list[
                     city_list.index(elem) + 1
-                    ] = f"name: {elem['name']}, country: {elem['country']}, state: {elem.get('state', '')}"
+                ] = f"name: {elem['name']}, country: {elem['country']}, state: {elem.get('state', '')}"
             return render_template(
                 "response.html", city_list=town_list, city_name=city_name_list[0]
             )

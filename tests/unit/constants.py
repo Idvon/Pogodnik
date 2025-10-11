@@ -31,20 +31,28 @@ with freeze_time("2023-01-01 00:00:00.000000+00:00"):
     OW_WEATHER_DATA = WeatherData(
         datetime.now(timezone.utc),
         "openweather",
-        298.48,  # hella hot
+        "Rain",
+        298.74,  # hella hot
         64,
         "N",
         349,
         0.62,
+        100,
+        3.16,
+        3163858,
     )
     OM_WEATHER_DATA = WeatherData(
         datetime.now(timezone.utc),
         "openmeteo",
-        2.4,
-        86,
-        "E",
-        95,
-        11.9,
+        "Clouds",
+        11.5,
+        76,
+        "NE",
+        30,
+        2.2,
+        76,
+        0.0,
+        None,
     )
     OW_CITY_DATA = CityData(OW_WEATHER_DATA, GEO_DATA)
     OM_CITY_DATA = CityData(OM_WEATHER_DATA, GEO_DATA)
@@ -100,18 +108,28 @@ OM_RESPONSE = {
     "current_units": {
         "time": "iso8601",
         "interval": "seconds",
-        "temperature_2m": "°C",
+        "apparent_temperature": "°C",
         "relative_humidity_2m": "%",
         "wind_direction_10m": "°",
         "wind_speed_10m": "m/s",
+        "precipitation": "mm",
+        "cloud_cover": "%",
+        "rain": "mm",
+        "showers": "mm",
+        "snowfall": "cm",
     },
     "current": {
         "time": "2025-08-14T17:15",
         "interval": 900,
-        "temperature_2m": 2.4,
-        "relative_humidity_2m": 86,
-        "wind_direction_10m": 95,
-        "wind_speed_10m": 11.9,
+        "apparent_temperature": 11.5,
+        "relative_humidity_2m": 76,
+        "wind_direction_10m": 30,
+        "wind_speed_10m": 2.20,
+        "precipitation": 0.00,
+        "cloud_cover": 76,
+        "rain": 0.00,
+        "showers": 0.00,
+        "snowfall": 0.00,
     },
 }
 GEOCODING_RESPONSE = [
