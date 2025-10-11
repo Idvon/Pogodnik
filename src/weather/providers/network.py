@@ -19,14 +19,24 @@ class OpenWeatherWeatherProvider(WeatherProvider):
     def weather_data(self):
         if self.response["cod"] != 200:
             raise ProviderNoDataError("Please, check weather API key")
+        if self.response.get("rain", 0) != 0:
+            precipitation = self.response["rain"]["1h"]
+        elif self.response.get("snow", 0) != 0:
+            precipitation = self.response["snow"]["1h"]
+        else:
+            precipitation = 0
         return WeatherData(
             datetime.now(timezone.utc),
             "openweather",
-            self.response["main"]["temp"],
+            self.response["weather"][0]["main"],
+            self.response["main"]["feels_like"],
             self.response["main"]["humidity"],
             direction(self.response["wind"]["deg"]),
             self.response["wind"]["deg"],
             self.response["wind"]["speed"],
+            self.response["clouds"]["all"],
+            precipitation,
+            self.response["id"],
         )
 
 
@@ -36,24 +46,43 @@ class OpenMeteoWeatherProvider(WeatherProvider):
             "latitude": coords.lat,
             "longitude": coords.lon,
             "current": [
-                "temperature_2m",
+                "apparent_temperature",
                 "relative_humidity_2m",
                 "wind_direction_10m",
                 "wind_speed_10m",
+                "precipitation",
+                "cloud_cover",
+                "rain",
+                "showers",
+                "snowfall",
             ],
             "wind_speed_unit": "ms",
         }
         self.url = "https://api.open-meteo.com/v1/forecast"
 
     def weather_data(self):
+        if self.response["current"]["rain"] > 0:
+            status = "Rain"
+        elif self.response["current"]["showers"] > 0:
+            status = "Shower"
+        elif self.response["current"]["snowfall"] > 0:
+            status = "Snow"
+        elif self.response["current"]["cloud_cover"] > 10:
+            status = "Clouds"
+        else:
+            status = "Clear"
         return WeatherData(
             datetime.now(timezone.utc),
             "openmeteo",
-            self.response["current"]["temperature_2m"],
+            status,
+            self.response["current"]["apparent_temperature"],
             self.response["current"]["relative_humidity_2m"],
             direction(int(self.response["current"]["wind_direction_10m"])),
             int(self.response["current"]["wind_direction_10m"]),
             self.response["current"]["wind_speed_10m"],
+            self.response["current"]["cloud_cover"],
+            self.response["current"]["precipitation"],
+            None,
         )
 
 

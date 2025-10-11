@@ -70,11 +70,15 @@ def test_db_weather_provider(mocked_connect):
         (
             "2023-01-01 00:00:00.000000+00:00",
             "openweather",
-            298.48,
+            "Rain",
+            298.74,  # hella hot
             64,
             "N",
             349,
             0.62,
+            100,
+            3.16,
+            3163858,
             "London",
             "GB",
             "England",

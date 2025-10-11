@@ -12,13 +12,19 @@
 		<header>
             <div class="uk-padding uk-light uk-text-left uk-text-large uk-inline">
                 <p class="text" style="color: white">
-                    {% for key, val in city_list.items() %}
-                    <a href="{{ url_for('data', num=key, city_name=city_name) }}">{{ key }}. {{ val }}</a>
+                    {% set data = data.split('\n') %}
+                    {% for item in data %}
+                    {{ item }}
                         {% if not loop.last %}
                          <br/>
                         {% endif %}
                     {% endfor %}
                 </p>
+                <div class="uk-margin-small">
+                    <a href="/" class="uk-button uk-button-primary uk-border-pill uk-button-large">
+                        Return
+                    </a>
+                </div>
             </div>
         </header>
 		<!--/HEADER-->
@@ -26,7 +32,7 @@
         <!--CONTENT-->
 		<section>
 			<div style="text-align: center;" class="uk-padding">
-				<img src="/static/img/list.svg">
+				<img src="/static/img/weather_om.svg">
 			</div>
 		</section>
 		<!--/CONTENT-->
