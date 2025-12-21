@@ -1,3 +1,5 @@
+<img src="./docs/pic.png" width="400px"/>
+
 # PoGoDnIk
 ## Soft for pogoda
 ### Особенности:
