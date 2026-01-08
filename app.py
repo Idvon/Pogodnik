@@ -10,7 +10,7 @@ from src.output.conclusion import to_display
 from src.structures import CityData
 
 APP = Flask(__name__)
-CONFIG = Path("c.json")
+CONFIG = Path("config.json")
 
 
 # parsing config file
@@ -71,7 +71,7 @@ async def response(city_name: str):
 async def data(num: int, city_name: str):
     try:
         city_name_list = [city_name]
-        output = Path("o.csv")
+        output = Path("out.csv")
         weather_config = get_config().get_weather_config()
         weather_provider = get_config().get_weather_config().provider
         key = get_config().get_weather_config().api_key
