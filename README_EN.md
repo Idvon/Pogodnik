@@ -2,83 +2,117 @@
 
 # PoGoDnIk
 ## Soft for pogoda
-### Особенности:
-#### - Погода по выбранному городу
-#### - Вывод в консоль или веб-интерфейс
-#### - Вывод в базу данных (Sqlite3)
-#### - Вывод в CSV-файл
-#### - Доступные провайдеры:
+### Features:
+___
+#### - Weather for the selected city
+#### - Output to console or web interface
+#### - Output to database (Sqlite3)
+#### - Output to CSV file
+#### - Available providers:
 ##### [Open Weather](https://openweathermap.org)
 ##### [Open Meteo](https://open-meteo.com)
 
----
-### Установка
-**1. Создание окружения**
+## Installation
+___
+### **Preparation**
+
+Python 3.13 is recommended for running application
+
+Instructions for Windows 10
+
+Download repository
+```
+git clone https://github.com/Idvon/Pogodnik.git
+```
+### **Creating environment**
+
+In CMD, navigate to repository directory and run the command
+```commandline
+virtualenv virtualenv_name
+```
+Activate environment
+```commandline
+virtualenv_name\Scripts\activate
+```
+Install packages
 ```
 poetry install
 ```
-**2. Создание config-файла**  
-Примеры в репозитории  
+### **Configure config file**
 
-Поддерживаемые форматы:
-- JSON
-- TOML
+Supported formats
 
-Структура:
+[Example JSON](example_config.json)
 
-- `city_name`: Название вашего города на латинице  
-- `timeout`: Время кеширования погоды города в минутах  
-- `weather_provider`: Параметры провайдера погоды  
-- `name`: Название  
-- `api_key`: API-ключ указанного провайдера  
-- `geo_provider`: Параметры провайдера геопозиции   
-- `name`: Название  
-- `limit`: Кол-во отображаемых вариантов найденого города (Только для веб-интерфейса, по умолчанию 5)  
-- `api_key`: API-ключ указанного провайдера
+[Example TOML](example_config.toml)
 
-Файл должен иметь название "config"
+Structure of config file
 
-**3. Запуск**  
+- `city_name`: Name of your city or a list of cities
+- `timeout`: Cache duration for city weather in minutes
+- `weather_provider`: Weather provider parameters 
+  - `name`: Name
+  - `api_key`: API key of the specified provider  
+- `geo_provider`: Geolocation provider parameters   
+  - `name`: Name  
+  - `limit`: Number of displayed city search results (Only for web interface, default 5)  
+  - `api_key`: API key of the specified provider
 
-Вывод в консоль:
+For Flask to work, the file must be named "config.json"
+
+## **Run**  
+___
+
+Commands are entered in CMD within the activated environment
+
+Output to console
 ```
 python PoGoDnIk.py --config config.json --output out.csv
 ```
-Пример вывода:
+Sample output
 ```
 Weather in Saint Petersburg
 Country: RU
 State: Saint Petersburg
-Temperature: 15.55 °C
-Humidity: 76 %
-Wind speed: 3 m/s
-Wind direction: W
+Status: Clouds
+Temperature: 3.41 °C
+Humidity: 91 %
+Wind speed: 5 m/s
+Wind direction: SE
+Clouds: 75 %
+Precipitation: 0 mm
 By openweather
 ```
-Вывод в веб-интерфейс:
+Using the web interface
 ```
 flask run
 ```
-Окно ввода города:
+Located at: http://127.0.0.1:5000/
 
-![](./docs/welcome.png)
+City input window:
 
-Выбор города из списка найденых (от 1 до 5):
+<img src="./docs/welcome.png" width="400px"/>
 
-![](./docs/cities.png)
+Choosing a city from the list of found ones (from 1 to 5):
 
-Получение информации:
+<img src="./docs/cities.png" width="400px"/>
 
-![](./docs/weather.png)
+Weather page (widget available from OpenWeather provider):
 
-**4. База данных**
+<img src="./docs/weather.png" width="400px"/>
 
-Каждый релевантный результат записывается в db.sqlite3 и файл вывода при `timeout` > время с прошлого запроса
+### **Database**
 
-**5. Дорожная карта**
+Each relevant result is written to db.sqlite3 and the output file out.csv when timeout > time since the last request
 
-- [x] Альтернативный источник погоды
-- [x] База данных
-- [x] Кеширование
-- [x] Веб-интерфейс
-- [ ] Вывод прогноза погоды на весь день, неделю 
+Otherwise, data is retrieved from the database cache
+
+## **Roadmap**
+___
+
+- [x] Alternative weather source
+- [x] Database
+- [x] Caching
+- [x] Web interface
+- [x] Output of weather forecast for the entire day, week (only OpenWeather)
+- [ ] Docker container
