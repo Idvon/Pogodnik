@@ -1,6 +1,9 @@
 from pathlib import Path
 
-from flask import Flask, redirect, render_template, request, url_for
+from fastapi import FastAPI, Request
+from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 from PoGoDnIk import get_cache, main, to_cache
 from src.config_file_parser.file_parser import create_parser
@@ -9,7 +12,9 @@ from src.geo.geocoding import create_geo_provider
 from src.output.conclusion import to_display
 from src.structures import CityData
 
-APP = Flask(__name__)
+APP = FastAPI()
+TEMPLATES = Jinja2Templates(directory="templates")
+APP.mount("/static", StaticFiles(directory="static"), name="static")
 CONFIG = Path("config.json")
 
 
@@ -22,17 +27,23 @@ def get_config():
 
 
 # first page with a form to receive city name
-@APP.route("/", methods=["GET", "POST"])
-def web_conclusion():
-    if request.method == "POST":
-        city_name = request.form["city_name"]
-        return redirect(url_for("response", city_name=city_name))
-    return render_template("index.html")
+@APP.get("/")
+async def web_conclusion(request: Request):
+    return TEMPLATES.TemplateResponse(request=request, name="index.html")
+
+
+@APP.post("/")
+async def city_redirect(request: Request):
+    city_name = await request.form()
+    return RedirectResponse(
+        url=str(request.url_for("response", city_name=city_name["city_name"])),
+        status_code=303,
+    )
 
 
 # second page with output of city data from cache or list with selection of city from found by geo provider
-@APP.route("/response/<city_name>")
-async def response(city_name: str):
+@APP.get("/response/{city_name}")
+async def response(request: Request, city_name: str):
     try:
         geo_config = get_config().get_geo_config()
         timeout = get_config().get_timeout()
@@ -45,30 +56,38 @@ async def response(city_name: str):
             cityid = cache[0].weather_data.cityid
             match weather_provider:
                 case "openweather":
-                    return render_template(
-                        "data_ow.html", data=text, key=key, cityid=cityid
+                    return TEMPLATES.TemplateResponse(
+                        request=request,
+                        name="data_ow.html",
+                        context={"data": text, "key": key, "cityid": cityid},
                     )
                 case "openmeteo":
-                    return render_template("data_om.html", data=text)
+                    return TEMPLATES.TemplateResponse(
+                        request=request, name="data_om.html", context={"data": text}
+                    )
         else:
             geo_provider = create_geo_provider(geo_config, city_name_list[0])
             await geo_provider.request()
             city_list = geo_provider.response
             town_list = dict()
             for elem in city_list:
-                town_list[
-                    city_list.index(elem) + 1
-                ] = f"name: {elem['name']}, country: {elem['country']}, state: {elem.get('state', '')}"
-            return render_template(
-                "response.html", city_list=town_list, city_name=city_name_list[0]
+                town_list[city_list.index(elem) + 1] = (
+                    f"name: {elem['name']}, country: {elem['country']}, state: {elem.get('state', '')}"
+                )
+            return TEMPLATES.TemplateResponse(
+                request=request,
+                name="response.html",
+                context={"city_list": town_list, "city_name": city_name_list[0]},
             )
     except (ProviderNoDataError, ProviderCreationError) as error:
-        return render_template("exceptions.html", message=error)
+        return TEMPLATES.TemplateResponse(
+            request=request, name="exceptions.html", context={"message": error}
+        )
 
 
 # third page with output of data of selected city and writing these data to DB and output file
-@APP.route("/data/<int:num>/<city_name>")
-async def data(num: int, city_name: str):
+@APP.get("/data/{num}/{city_name}")
+async def data(request: Request, num: int, city_name: str):
     try:
         city_name_list = [city_name]
         output = Path("out.csv")
@@ -84,10 +103,18 @@ async def data(num: int, city_name: str):
         cityid = city_data[0].weather_data.cityid
         match weather_provider:
             case "openweather":
-                return render_template(
-                    "data_ow.html", data=data_template, key=key, cityid=cityid
+                return TEMPLATES.TemplateResponse(
+                    request=request,
+                    name="data_ow.html",
+                    context={"data": data_template, "key": key, "cityid": cityid},
                 )
             case "openmeteo":
-                return render_template("data_om.html", data=data_template)
+                return TEMPLATES.TemplateResponse(
+                    request=request,
+                    name="data_om.html",
+                    context={"data": data_template},
+                )
     except (ProviderNoDataError, ProviderCreationError) as error:
-        return render_template("exceptions.html", message=error)
+        return TEMPLATES.TemplateResponse(
+            request=request, name="exceptions.html", context={"message": error}
+        )
