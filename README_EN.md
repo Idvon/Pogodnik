@@ -85,9 +85,9 @@ By openweather
 ```
 Using the web interface
 ```
-flask run
+fastapi run
 ```
-Located at: http://127.0.0.1:5000/
+Located at: http://127.0.0.1:8000/
 
 City input window:
 

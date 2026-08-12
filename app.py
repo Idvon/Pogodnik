@@ -17,7 +17,7 @@ APP = FastAPI()
 CUR_PATH = Path(__file__).parent
 TEMPLATES = Jinja2Templates(directory=CUR_PATH / "templates")
 APP.mount("/static", StaticFiles(directory=CUR_PATH / "static"), name="static")
-CONFIG = Path("configs.json")
+CONFIG = Path("config.json")
 
 
 # parsing config file
